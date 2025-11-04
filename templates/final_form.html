@@ -1,135 +1,186 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>Controle de Carro - Final</title>
-    <style>
-        body {
-          margin: 0;
-          padding: 0;
-          font-family: 'Segoe UI', sans-serif;
-          /* gradiente azul-claro → azul-escuro */
-          background: linear-gradient(100deg, #b001a8 0%, #0277b7 100%);
-          min-height: 100vh;   /* garante que o gradiente cubra toda a altura */
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-        form {
-            display: flex;
-            flex-direction: column;
-        }
-        label {
-            margin-top: 10px;
-            font-weight: bold;
-        }
-        input {
-            padding: 8px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        input[readonly] {
-            background-color: #f9f9f9;
-            color: #666;
-        }
-        button {
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-  .meu-paragrafo {
-          color: #000000;
-          font-weight: bold;
-          margin-top: 10px;
-          margin-left: 35%;
-        }
+  <meta charset="UTF-8">
+  <title>Controle de Carro - Final</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(100deg, #b001a8 0%, #0277b7 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
+    .container {
+      width: 90%;
+      max-width: 600px;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+      margin: 20px;
+    }
 
-        button:hover {
-            background-color: #45a049;
-        }
-    </style>
+    h1 {
+      text-align: center;
+      color: #333;
+      font-size: 1.6rem;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      margin-top: 12px;
+      font-weight: bold;
+      font-size: 0.95rem;
+    }
+
+    input {
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 0.95rem;
+    }
+
+    input[readonly] {
+      background-color: #f9f9f9;
+      color: #666;
+    }
+
+    button {
+      margin-top: 25px;
+      padding: 12px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .alerta {
+      font-weight: bold;
+      margin-top: 25px;
+      color: red;
+      font-size: 0.95rem;
+      text-align: center;
+    }
+
+    .meu-paragrafo {
+      color: #000;
+      font-weight: bold;
+      text-align: center;
+      font-size: 1rem;
+      margin-top: 5px;
+    }
+
+    /* Responsividade */
+    @media (max-width: 600px) {
+      .container {
+        padding: 15px;
+        border-radius: 10px;
+      }
+
+      h1 {
+        font-size: 1.4rem;
+      }
+
+      label {
+        font-size: 0.9rem;
+      }
+
+      input {
+        font-size: 0.9rem;
+        padding: 9px;
+      }
+
+      button {
+        font-size: 0.95rem;
+        padding: 10px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Controle de Carro - Chegada</h1>
-        <form id="finalForm">
-            <input type="hidden" id="cpf" name="cpf" value="{{ cpf }}">
-            <label for="requester_name">Nome do Solicitante:</label>
-            <input type="text" id="requester_name" name="requester_name" value="{{ record.requester_name }}" readonly>
+  <div class="container">
+    <h1>Controle de Carro - Chegada</h1>
+    <form id="finalForm">
+      <input type="hidden" id="cpf" name="cpf" value="{{ cpf }}">
 
-            <label for="driver_name">Nome do Motorista:</label>
-            <input type="text" id="driver_name" name="driver_name" value="{{ record.driver_name }}" readonly>
+      <label for="requester_name">Nome do Solicitante:</label>
+      <input type="text" id="requester_name" name="requester_name" value="{{ record.requester_name }}" readonly>
 
-            <label for="date">Data:</label>
-            <input type="date" id="date" name="date" value="{{ record.date }}" readonly>
+      <label for="driver_name">Nome do Motorista:</label>
+      <input type="text" id="driver_name" name="driver_name" value="{{ record.driver_name }}" readonly>
 
-            <label for="initial_km">Km Inicial:</label>
-            <input type="number" id="initial_km" name="initial_km" value="{{ record.initial_km }}" readonly>
+      <label for="date">Data:</label>
+      <input type="date" id="date" name="date" value="{{ record.date }}" readonly>
 
-            <label for="departure_time">Horário de Saída:</label>
-            <input type="time" id="departure_time" name="departure_time" value="{{ record.departure_time }}" readonly>
+      <label for="initial_km">Km Inicial:</label>
+      <input type="number" id="initial_km" name="initial_km" value="{{ record.initial_km }}" readonly>
 
-            <label for="origin">Endereço de Origem:</label>
-            <input type="text" id="origin" name="origin" value="{{ record.origin }}" readonly>
+      <label for="departure_time">Horário de Saída:</label>
+      <input type="time" id="departure_time" name="departure_time" value="{{ record.departure_time }}" readonly>
 
-            <label for="initial_tank_level">Nível Inicial do Tanque (Litros):</label>
-            <input type="number" id="initial_tank_level" name="initial_tank_level" value="{{ record.initial_tank_level }}" readonly>
+      <label for="origin">Endereço de Origem:</label>
+      <input type="text" id="origin" name="origin" value="{{ record.origin }}" readonly>
 
-            <label for="destination">Endereço de Destino:</label>
-            <input type="text" id="destination" name="destination" value="{{ record.destination }}" readonly>
+      <label for="initial_tank_level">Nível Inicial do Tanque (Litros):</label>
+      <input type="number" id="initial_tank_level" name="initial_tank_level" value="{{ record.initial_tank_level }}" readonly>
 
-            <label for="final_km">Km Final:</label>
-            <input type="number" id="final_km" name="final_km" required>
+      <label for="destination">Endereço de Destino:</label>
+      <input type="text" id="destination" name="destination" value="{{ record.destination }}" readonly>
 
-            <label for="arrival_time">Hora de Chegada:</label>
-            <input type="time" id="arrival_time" name="arrival_time" required>
+      <label for="final_km">Km Final:</label>
+      <input type="number" id="final_km" name="final_km" required>
 
-            <label for="final_tank_level">Nível Final do Tanque (Litros):</label>
-            <input type="number" id="final_tank_level" name="final_tank_level" min="0" max="100" required>
+      <label for="arrival_time">Hora de Chegada:</label>
+      <input type="time" id="arrival_time" name="arrival_time" required>
 
-            <button type="submit">Salvar Chegada</button>
-        </form>
-          <p style="font-weight: bold; margin-top: 20px; color: red; font-size: 15px;">⚠ Mande foto do carro no momento de saída e chegada no número abaixo ⚠</p>
-       <p class="meu-paragrafo">(11) 99999-9999</p>
-    </div>
+      <label for="final_tank_level">Nível Final do Tanque (Litros):</label>
+      <input type="number" id="final_tank_level" name="final_tank_level" min="0" max="100" required>
 
-    <script>
-        document.getElementById('finalForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData);
-            fetch('/submit_final', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'ok') {
-                    alert('Chegada salva com sucesso!');
-                    e.target.reset();
-                } else {
-                    alert('Erro ao salvar chegada.');
-                }
-            });
-        });
-    </script>
+      <button type="submit">Salvar Chegada</button>
+    </form>
+
+    <p class="alerta">⚠ Mande foto do carro no momento de saída e chegada no número abaixo ⚠</p>
+    <p class="meu-paragrafo">(11) 99999-9999</p>
+  </div>
+
+  <script>
+    document.getElementById('finalForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData);
+      fetch('/submit_final', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'ok') {
+          alert('Chegada salva com sucesso!');
+          e.target.reset();
+        } else {
+          alert('Erro ao salvar chegada.');
+        }
+      });
+    });
+  </script>
 </body>
 </html>
