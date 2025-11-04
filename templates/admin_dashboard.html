@@ -2,77 +2,163 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Controle de Carro</title>
     <style>
         body {
-          margin: 0;
-          padding: 0;
-          font-family: 'Segoe UI', sans-serif;
-          /* gradiente azul-claro → azul-escuro */
-          background: linear-gradient(100deg, #b001a8 0%, #0277b7 100%);
-          min-height: 100vh;   /* garante que o gradiente cubra toda a altura */
-          display: flex;
-        align-items: center;      /* vertical   */
-        justify-content: center;  /* horizontal */
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(100deg, #b001a8 0%, #0277b7 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
+
         .container {
+            width: 90%;
             max-width: 1200px;
-            margin: 0 auto;
             background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            overflow-x: auto; /* permite scroll horizontal em telas pequenas */
         }
+
         h1 {
             text-align: center;
             color: #333;
+            font-size: 24px;
+            margin-bottom: 25px;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            min-width: 900px; /* mantém tabela legível */
         }
+
         th, td {
             padding: 10px;
             text-align: left;
             border-bottom: 1px solid #ddd;
+            white-space: nowrap;
         }
+
         th {
             background-color: #f2f2f2;
+            color: #333;
+            font-weight: 600;
         }
+
+        td {
+            color: #555;
+        }
+
         .actions {
-            margin-top: 20px;
+            margin-top: 25px;
             text-align: center;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
         }
-        button {
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            margin: 0 10px;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
+
         a {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 20px;
+            padding: 12px 20px;
             background-color: #2196F3;
             color: white;
             text-decoration: none;
-            border-radius: 4px;
+            border-radius: 6px;
+            transition: background-color 0.25s ease;
+            font-size: 15px;
+            font-weight: 500;
         }
+
         a:hover {
             background-color: #0b7dda;
+        }
+
+        /* botão verde reaproveitando padrão */
+        .download {
+            background-color: #4CAF50;
+        }
+
+        .download:hover {
+            background-color: #45a049;
+        }
+
+        /* Responsividade */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 25px 30px;
+                width: 95%;
+            }
+
+            table {
+                font-size: 15px;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                align-items: flex-start;
+                padding: 20px 0;
+            }
+
+            .container {
+                width: 90%;
+                padding: 20px;
+                border-radius: 10px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            table {
+                font-size: 14px;
+                min-width: 700px;
+            }
+
+            a {
+                font-size: 14px;
+                padding: 10px 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                width: 95%;
+                padding: 18px;
+            }
+
+            h1 {
+                font-size: 18px;
+            }
+
+            table {
+                font-size: 13px;
+                min-width: 600px;
+            }
+
+            a {
+                display: block;
+                width: 100%;
+                text-align: center;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Admin Dashboard - Registros de Controle de Carro</h1>
+
         <table>
             <thead>
                 <tr>
@@ -109,8 +195,9 @@
                 {% endfor %}
             </tbody>
         </table>
+
         <div class="actions">
-            <a href="/download_excel">Baixar Planilha Excel</a>
+            <a href="/download_excel" class="download">Baixar Planilha Excel</a>
             <a href="/">Voltar ao Login</a>
         </div>
     </div>
