@@ -4,57 +4,120 @@
     <meta charset="UTF-8">
     <title>Registros de Carro</title>
     <style>
-
         body {
           margin: 0;
           padding: 0;
           font-family: 'Segoe UI', sans-serif;
-          /* gradiente azul-claro → azul-escuro */
           background: linear-gradient(100deg, #b001a8 0%, #0277b7 100%);
-          min-height: 100vh;   /* garante que o gradiente cubra toda a altura */
+          min-height: 100vh;
         }
+
         .container {
             max-width: 1000px;
-            margin: 0 auto;
+            margin: 40px auto;
             background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
         }
+
         h1 {
             text-align: center;
             color: #333;
+            margin-bottom: 25px;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
+
         th, td {
             padding: 10px;
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
+
         th {
             background-color: #f2f2f2;
+            font-weight: bold;
         }
+
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tbody tr:hover {
+            background-color: #eef6ff;
+        }
+
+        .actions {
+            text-align: center;
+            margin-top: 30px;
+        }
+
         a {
             display: inline-block;
-            margin-top: 20px;
-            padding: 10px 20px;
+            padding: 12px 24px;
             background-color: #4CAF50;
             color: white;
             text-decoration: none;
-            border-radius: 4px;
+            font-weight: bold;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: background 0.2s ease-in-out, transform 0.2s;
         }
+
         a:hover {
             background-color: #45a049;
+            transform: scale(1.05);
+        }
+
+        /* --- Responsividade --- */
+        @media (max-width: 768px) {
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+
+            thead {
+                display: none;
+            }
+
+            tr {
+                margin-bottom: 15px;
+                background: #fff;
+                border-radius: 8px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+                padding: 10px;
+            }
+
+            td {
+                border: none;
+                padding: 8px 0;
+                border-bottom: 1px solid #eee;
+                position: relative;
+            }
+
+            td::before {
+                content: attr(data-label);
+                font-weight: bold;
+                color: #333;
+                display: block;
+            }
+
+            td:last-child {
+                border-bottom: none;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Registros de Controle de Carro</h1>
+
         <table>
             <thead>
                 <tr>
@@ -74,22 +137,25 @@
             <tbody>
                 {% for record in records %}
                 <tr>
-                    <td>{{ record.requester_name }}</td>
-                    <td>{{ record.driver_name }}</td>
-                    <td>{{ record.date }}</td>
-                    <td>{{ record.initial_km }}</td>
-                    <td>{{ record.departure_time }}</td>
-                    <td>{{ record.origin }}</td>
-                    <td>{{ record.initial_tank_level }}</td>
-                    <td>{{ record.destination }}</td>
-                    <td>{{ record.final_km }}</td>
-                    <td>{{ record.arrival_time }}</td>
-                    <td>{{ record.final_tank_level }}</td>
+                    <td data-label="Nome do Solicitante">{{ record.requester_name }}</td>
+                    <td data-label="Nome do Motorista">{{ record.driver_name }}</td>
+                    <td data-label="Data">{{ record.date }}</td>
+                    <td data-label="Km Inicial">{{ record.initial_km }}</td>
+                    <td data-label="Horário de Saída">{{ record.departure_time }}</td>
+                    <td data-label="Origem">{{ record.origin }}</td>
+                    <td data-label="Nível Inicial do Tanque">{{ record.initial_tank_level }}</td>
+                    <td data-label="Destino">{{ record.destination }}</td>
+                    <td data-label="Km Final">{{ record.final_km }}</td>
+                    <td data-label="Hora de Chegada">{{ record.arrival_time }}</td>
+                    <td data-label="Nível Final do Tanque">{{ record.final_tank_level }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-        <a href="/">Novo Registro</a>
+
+        <div class="actions">
+            <a href="/">+ Novo Registro</a>
+        </div>
     </div>
 </body>
 </html>
