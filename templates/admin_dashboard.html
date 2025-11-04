@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard - Controle de Carro</title>
+    <style>
+        body {
+          margin: 0;
+          padding: 0;
+          font-family: 'Segoe UI', sans-serif;
+          /* gradiente azul-claro → azul-escuro */
+          background: linear-gradient(100deg, #b001a8 0%, #0277b7 100%);
+          min-height: 100vh;   /* garante que o gradiente cubra toda a altura */
+          display: flex;
+        align-items: center;      /* vertical   */
+        justify-content: center;  /* horizontal */
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .actions {
+            margin-top: 20px;
+            text-align: center;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #2196F3;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        a:hover {
+            background-color: #0b7dda;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Admin Dashboard - Registros de Controle de Carro</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>CPF</th>
+                    <th>Nome do Solicitante</th>
+                    <th>Nome do Motorista</th>
+                    <th>Data</th>
+                    <th>Km Inicial</th>
+                    <th>Horário de Saída</th>
+                    <th>Origem</th>
+                    <th>Nível Inicial do Tanque</th>
+                    <th>Destino</th>
+                    <th>Km Final</th>
+                    <th>Hora de Chegada</th>
+                    <th>Nível Final do Tanque</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in records %}
+                <tr>
+                    <td>{{ record.cpf }}</td>
+                    <td>{{ record.requester_name }}</td>
+                    <td>{{ record.driver_name }}</td>
+                    <td>{{ record.date }}</td>
+                    <td>{{ record.initial_km }}</td>
+                    <td>{{ record.departure_time }}</td>
+                    <td>{{ record.origin }}</td>
+                    <td>{{ record.initial_tank_level }}</td>
+                    <td>{{ record.destination }}</td>
+                    <td>{{ record.final_km or '' }}</td>
+                    <td>{{ record.arrival_time or '' }}</td>
+                    <td>{{ record.final_tank_level or '' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="actions">
+            <a href="/download_excel">Baixar Planilha Excel</a>
+            <a href="/">Voltar ao Login</a>
+        </div>
+    </div>
+</body>
+</html>

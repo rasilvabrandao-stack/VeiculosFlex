@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Controle de Carro</title>
+    <style>
+        body {
+          margin: 0;
+          padding: 0;
+          font-family: 'Segoe UI', sans-serif;
+          /* gradiente azul-claro → azul-escuro */
+          background: linear-gradient(100deg, #b001a8 0%, #0277b7 100%);
+          min-height: 100vh;   /* garante que o gradiente cubra toda a altura */
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        input, select {
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Controle de Carro</h1>
+        <form id="carForm">
+            <label for="requester_name">Nome do Solicitante:</label>
+            <input type="text" id="requester_name" name="requester_name" required>
+
+            <label for="driver_name">Nome do Motorista:</label>
+            <input type="text" id="driver_name" name="driver_name" required>
+
+            <label for="date">Data:</label>
+            <input type="date" id="date" name="date" required>
+
+            <label for="initial_km">Km Inicial:</label>
+            <input type="number" id="initial_km" name="initial_km" required>
+
+            <label for="departure_time">Horário de Saída:</label>
+            <input type="time" id="departure_time" name="departure_time" required>
+
+            <label for="origin">Origem:</label>
+            <input type="text" id="origin" name="origin" required>
+
+            <label for="initial_tank_level">Nível Inicial do Tanque:</label>
+            <input type="number" id="initial_tank_level" name="initial_tank_level" min="0" max="100" required>
+
+            <label for="destination">Destino:</label>
+            <input type="text" id="destination" name="destination" required>
+
+            <label for="final_km">Km Final:</label>
+            <input type="number" id="final_km" name="final_km" required>
+
+            <label for="arrival_time">Hora de Chegada:</label>
+            <input type="time" id="arrival_time" name="arrival_time" required>
+
+            <label for="final_tank_level">Nível Final do Tanque:</label>
+            <input type="number" id="final_tank_level" name="final_tank_level" min="0" max="100" required>
+
+            <label for="invoice_value">Valor da Nota:</label>
+            <input type="number" id="invoice_value" name="invoice_value" step="0.01" required>
+
+            <button type="submit">Salvar Registro</button>
+        </form>
+        <a href="/view_records">Ver Registros</a>
+    </div>
+
+    <script>
+        document.getElementById('carForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            fetch('/submit_record', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'ok') {
+                    alert('Registro salvo com sucesso!');
+                    e.target.reset();
+                } else {
+                    alert('Erro ao salvar registro.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
