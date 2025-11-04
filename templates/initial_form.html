@@ -109,6 +109,25 @@
         padding: 10px;
       }
     }
+/* Remove o estilo nativo dos inputs de data e hora */
+input[type="date"],
+input[type="time"] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: white;
+  color: #000;
+}
+
+/* Mantém o estilo igual aos outros inputs */
+input[type="date"]:focus,
+input[type="time"]:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+}
+
+    
   </style>
 </head>
 <body>
