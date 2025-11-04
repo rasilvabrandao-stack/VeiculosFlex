@@ -2,53 +2,137 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Controle de Carro</title>
     <style>
         body {
-          margin: 0;
-          padding: 0;
-          font-family: 'Segoe UI', sans-serif;
-          /* gradiente azul-claro → azul-escuro */
-          background: linear-gradient(100deg, #b001a8 0%, #0277b7 100%);
-          min-height: 100vh;   /* garante que o gradiente cubra toda a altura */
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(100deg, #b001a8 0%, #0277b7 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 0;
         }
+
         .container {
+            width: 90%;
             max-width: 600px;
-            margin: 0 auto;
             background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
         }
+
         h1 {
             text-align: center;
             color: #333;
+            font-size: 24px;
+            margin-bottom: 25px;
         }
+
         form {
             display: flex;
             flex-direction: column;
         }
+
         label {
             margin-top: 10px;
-            font-weight: bold;
+            font-weight: 600;
+            color: #333;
         }
+
         input, select {
-            padding: 8px;
+            padding: 10px;
             margin-top: 5px;
             border: 1px solid #ccc;
-            border-radius: 4px;
+            border-radius: 6px;
+            font-size: 15px;
         }
+
         button {
-            margin-top: 20px;
-            padding: 10px;
+            margin-top: 25px;
+            padding: 12px;
             background-color: #4CAF50;
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.25s ease;
         }
+
         button:hover {
             background-color: #45a049;
+        }
+
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #0277b7;
+            font-weight: 500;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 0;
+                align-items: flex-start;
+            }
+
+            .container {
+                width: 92%;
+                padding: 25px;
+                border-radius: 10px;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+
+            input, select, button {
+                font-size: 16px;
+            }
+
+            button {
+                padding: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                width: 95%;
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            label {
+                font-size: 14px;
+            }
+
+            input, select {
+                font-size: 15px;
+            }
+
+            button {
+                font-size: 15px;
+                padding: 13px;
+            }
+
+            a {
+                font-size: 14px;
+            }
         }
     </style>
 </head>
@@ -74,7 +158,7 @@
             <label for="origin">Origem:</label>
             <input type="text" id="origin" name="origin" required>
 
-            <label for="initial_tank_level">Nível Inicial do Tanque:</label>
+            <label for="initial_tank_level">Nível Inicial do Tanque (%):</label>
             <input type="number" id="initial_tank_level" name="initial_tank_level" min="0" max="100" required>
 
             <label for="destination">Destino:</label>
@@ -86,10 +170,10 @@
             <label for="arrival_time">Hora de Chegada:</label>
             <input type="time" id="arrival_time" name="arrival_time" required>
 
-            <label for="final_tank_level">Nível Final do Tanque:</label>
+            <label for="final_tank_level">Nível Final do Tanque (%):</label>
             <input type="number" id="final_tank_level" name="final_tank_level" min="0" max="100" required>
 
-            <label for="invoice_value">Valor da Nota:</label>
+            <label for="invoice_value">Valor da Nota (R$):</label>
             <input type="number" id="invoice_value" name="invoice_value" step="0.01" required>
 
             <button type="submit">Salvar Registro</button>
@@ -98,26 +182,28 @@
     </div>
 
     <script>
-        document.getElementById('carForm').addEventListener('submit', function(e) {
+        document.getElementById('carForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
             const data = Object.fromEntries(formData);
-            fetch('/submit_record', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'ok') {
+
+            try {
+                const response = await fetch('/submit_record', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                });
+
+                const result = await response.json();
+                if (result.status === 'ok') {
                     alert('Registro salvo com sucesso!');
                     e.target.reset();
                 } else {
                     alert('Erro ao salvar registro.');
                 }
-            });
+            } catch (error) {
+                alert('Erro de conexão. Tente novamente.');
+            }
         });
     </script>
 </body>
