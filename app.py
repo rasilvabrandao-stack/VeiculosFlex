@@ -150,8 +150,19 @@ def submit_admin_login():
 
 @app.route('/admin_dashboard')
 def admin_dashboard():
-    records = load_car_records()
-    all_records = [r for r in records if r.get('status') in ['initial', 'complete']]
+    if supabase:
+        try:
+            # Fetch all records from Supabase
+            response = supabase.table('registros').select('*').execute()
+            all_records = response.data
+        except Exception as e:
+            # Fallback to local JSON if Supabase fails
+            records = load_car_records()
+            all_records = [r for r in records if r.get('status') in ['initial', 'complete']]
+    else:
+        # Fallback to local JSON if Supabase is not available
+        records = load_car_records()
+        all_records = [r for r in records if r.get('status') in ['initial', 'complete']]
     return render_template('admin_dashboard.html', records=all_records)
 
 @app.route('/download_excel')
