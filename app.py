@@ -5,6 +5,8 @@ from datetime import datetime
 from io import BytesIO
 import openpyxl
 from openpyxl.styles import Font, Alignment, Border, Side
+import qrcode
+from PIL import Image
 
 app = Flask(__name__)
 
@@ -163,6 +165,27 @@ def download_excel():
     output.seek(0)
 
     return send_file(output, download_name='registros_carro.xlsx', as_attachment=True)
+
+@app.route('/qr_code')
+def qr_code():
+    url = "https://veiculosfleximedical-kure.onrender.com"
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(url)
+    qr.make(fit=True)
+
+    img = qr.make_image(fill_color="black", back_color="white")
+
+    # Save to BytesIO
+    output = BytesIO()
+    img.save(output, format='PNG')
+    output.seek(0)
+
+    return send_file(output, mimetype='image/png', download_name='qr_code.png')
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
