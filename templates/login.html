@@ -143,13 +143,30 @@
             <input type="text" id="driver_name" name="driver_name" required>
 
             <label for="cpf">CPF:</label>
-            <input type="text" id="cpf" name="cpf" required>
+
+<input type="text" id="cpf" name="cpf" maxlength="14" required>
+
 
             <button type="submit">Entrar</button>
         </form>
 
         <a href="/admin_login">Área Admin</a>
     </div>
+
+<script src="https://unpkg.com/imask"></script>
+
+<script>
+  // Seleciona o campo CPF
+  const cpfInput = document.getElementById('cpf');
+
+  // Cria a máscara com o padrão brasileiro
+  const maskOptions = {
+    mask: '000.000.000-00'
+  };
+
+  IMask(cpfInput, maskOptions);
+</script>
+
 
     <script>
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
