@@ -23,10 +23,15 @@
             padding: 30px 40px;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        .logo {
+            width: 130px;
+            margin-bottom: 15px;
         }
 
         h1 {
-            text-align: center;
             color: #333;
             font-size: 24px;
             margin-bottom: 25px;
@@ -35,6 +40,7 @@
         form {
             display: flex;
             flex-direction: column;
+            text-align: left;
         }
 
         label {
@@ -129,7 +135,9 @@
 <body>
 
     <div class="container">
+        <img src="{{ url_for('static', filename='img/fleximedical_kure.png') }}" alt="Logo da Empresa" class="logo">
         <h1>Admin Login</h1>
+
         <form id="adminLoginForm">
             <label for="username">Usuário:</label>
             <input type="text" id="username" name="username" required>
@@ -139,6 +147,7 @@
 
             <button type="submit">Entrar</button>
         </form>
+
         <a href="/">Voltar ao Login</a>
     </div>
 
