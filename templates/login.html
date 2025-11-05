@@ -12,36 +12,35 @@
             background: linear-gradient(100deg, #b001a8 0%, #0277b7 100%);
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
+            align-items: center;
             justify-content: center;
         }
 
-        .logo {
-            display: block;
-            margin: 40px auto 20px auto;
-            max-width: 200px;
-            height: auto;
-        }
-
         .container {
-            max-width: 45%;
-            margin: 0 auto;
+            width: 90%;
+            max-width: 400px;
             background: white;
             padding: 30px 40px;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        .logo {
+            width: 250px;
+            margin-bottom: 10px;
         }
 
         h1 {
-            text-align: center;
             color: #333;
             font-size: 24px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         form {
             display: flex;
             flex-direction: column;
+            text-align: left;
         }
 
         label {
@@ -65,8 +64,8 @@
             color: white;
             border: none;
             border-radius: 6px;
-            font-size: 16px;
             cursor: pointer;
+            font-size: 16px;
             transition: background-color 0.25s ease;
         }
 
@@ -76,10 +75,10 @@
 
         a {
             display: block;
+            margin-top: 20px;
             text-align: center;
-            margin-top: 15px;
-            text-decoration: none;
             color: #0277b7;
+            text-decoration: none;
             font-weight: 500;
         }
 
@@ -88,30 +87,20 @@
         }
 
         /* Responsividade */
-        @media (max-width: 1024px) {
-            .container {
-                max-width: 50%;
-            }
-        }
-
         @media (max-width: 768px) {
             body {
-                padding: 20px;
-                justify-content: flex-start;
-            }
-
-            .logo {
-                max-width: 150px;
-                margin: 30px auto 15px auto;
+                align-items: flex-start;
+                padding-top: 40px;
             }
 
             .container {
-                max-width: 90%;
-                padding: 25px;
+                width: 85%;
+                padding: 20px;
             }
 
             h1 {
                 font-size: 22px;
+                margin-bottom: 20px;
             }
 
             input, button {
@@ -133,18 +122,22 @@
                 font-size: 20px;
             }
 
-            .logo {
-                max-width: 130px;
+            input, button {
+                font-size: 15px;
+            }
+
+            a {
+                font-size: 14px;
             }
         }
     </style>
 </head>
 <body>
 
-    <img src="{{ url_for('static', filename='fleximedical_kure.png') }}" alt="Logo FlexiMedical" class="logo">
-
     <div class="container">
+        <img src="{{ url_for('static', filename='fleximedical_kure.png') }}" alt="Logo FlexiMedical" class="logo">
         <h1>Login - Controle de Carro</h1>
+
         <form id="loginForm">
             <label for="driver_name">Nome do Motorista:</label>
             <input type="text" id="driver_name" name="driver_name" required>
@@ -154,6 +147,7 @@
 
             <button type="submit">Entrar</button>
         </form>
+
         <a href="/admin_login">Área Admin</a>
     </div>
 
