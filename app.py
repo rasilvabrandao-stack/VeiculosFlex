@@ -5,10 +5,16 @@ from datetime import datetime
 from io import BytesIO
 import openpyxl
 from openpyxl.styles import Font, Alignment, Border, Side
+from supabase import create_client, Client
 
 app = Flask(__name__)
 
 CAR_RECORDS_FILE = "car_records.json"
+
+# Supabase configuration
+SUPABASE_URL = "https://agumdqjlbpbbohbxzoes.supabase.co"
+SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFndW1kcWpsYnBiYm9oYnh6b2VzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzNTU5NTEsImV4cCI6MjA3NzkzMTk1MX0.DX_W3XL4zj9gs-XC0O3aUptYdhjF9sda2qkj_E-aKx0"
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 def load_car_records():
     if not os.path.exists(CAR_RECORDS_FILE):
@@ -65,6 +71,23 @@ def submit_initial():
         'destination': data.get('destination'),
         'status': 'initial'
     }
+    # Insert into Supabase
+    try:
+        supabase.table('registros').insert({
+            'cpf': record['cpf'],
+            'requester_name': record['requester_name'],
+            'driver_name': record['driver_name'],
+            'date': record['date'],
+            'initial_km': record['initial_km'],
+            'departure_time': record['departure_time'],
+            'origin': record['origin'],
+            'initial_tank_level': record['initial_tank_level'],
+            'destination': record['destination'],
+            'status': 'initial'
+        }).execute()
+    except Exception as e:
+        return jsonify({"status": "error", "message": f"Erro ao salvar no Supabase: {str(e)}"})
+
     records = load_car_records()
     records.append(record)
     save_car_records(records)
@@ -74,6 +97,17 @@ def submit_initial():
 def submit_final():
     data = request.get_json()
     cpf = data.get('cpf')
+    # Update in Supabase
+    try:
+        supabase.table('registros').update({
+            'final_km': data.get('final_km'),
+            'arrival_time': data.get('arrival_time'),
+            'final_tank_level': data.get('final_tank_level'),
+            'status': 'complete'
+        }).eq('cpf', cpf).eq('status', 'initial').execute()
+    except Exception as e:
+        return jsonify({"status": "error", "message": f"Erro ao atualizar no Supabase: {str(e)}"})
+
     records = load_car_records()
     for record in records:
         if record.get('cpf') == cpf and record.get('status') == 'initial':
@@ -116,8 +150,13 @@ def admin_dashboard():
 
 @app.route('/download_excel')
 def download_excel():
-    records = load_car_records()
-    complete_records = [r for r in records if r.get('status') == 'complete']
+    try:
+        # Fetch data from Supabase
+        response = supabase.table('registros').select('*').execute()
+        registros = response.data
+        complete_records = [r for r in registros if r.get('status') == 'complete']
+    except Exception as e:
+        return jsonify({"status": "error", "message": f"Erro ao buscar dados do Supabase: {str(e)}"})
 
     # Create Excel workbook
     wb = openpyxl.Workbook()
