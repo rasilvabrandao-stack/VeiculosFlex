@@ -202,8 +202,7 @@ input[type="time"]:focus {
       <div class="photo-section">
         <label>Foto do Km Final:</label>
         <div class="photo-buttons">
-          <button type="button" onclick="takePhoto('final_km', 'environment')">Tirar Foto (Traseira)</button>
-          <button type="button" onclick="takePhoto('final_km', 'user')">Tirar Foto (Frontal)</button>
+          <button type="button" onclick="takePhoto('final_km')">Tirar Foto</button>
           <input type="file" id="final_km_file" name="final_km_photo" accept="image/*" style="display: none;">
           <button type="button" onclick="document.getElementById('final_km_file').click()">Escolher Foto</button>
         </div>
@@ -216,8 +215,7 @@ input[type="time"]:focus {
       <div class="photo-section">
         <label>Foto do Nível Final do Tanque:</label>
         <div class="photo-buttons">
-          <button type="button" onclick="takePhoto('final_tank', 'environment')">Tirar Foto (Traseira)</button>
-          <button type="button" onclick="takePhoto('final_tank', 'user')">Tirar Foto (Frontal)</button>
+          <button type="button" onclick="takePhoto('final_tank')">Tirar Foto</button>
           <input type="file" id="final_tank_file" name="final_tank_photo" accept="image/*" style="display: none;">
           <button type="button" onclick="document.getElementById('final_tank_file').click()">Escolher Foto</button>
         </div>
