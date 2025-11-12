@@ -235,7 +235,7 @@ input[type="time"]:focus {
 
   <script>
     function takePhoto(field) {
-      navigator.mediaDevices.getUserMedia({ video: true })
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
         .then(function(stream) {
           const video = document.createElement('video');
           video.srcObject = stream;
@@ -258,7 +258,7 @@ input[type="time"]:focus {
           });
         })
         .catch(function(err) {
-          alert('Erro ao acessar câmera: ' + err.message);
+          alert('Erro ao acessar câmera traseira: ' + err.message);
         });
     }
 
