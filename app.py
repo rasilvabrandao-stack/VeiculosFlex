@@ -62,9 +62,19 @@ def form(cpf):
 
 @app.route('/submit_initial', methods=['POST'])
 def submit_initial():
-    data = request.get_json()
+    data = request.form.to_dict()
+    cpf = data.get('cpf')
+    photos = {}
+    for key in request.files:
+        file = request.files[key]
+        if file and file.filename:
+            filename = f"{cpf}_{key}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg"
+            filepath = os.path.join('static', 'photos', filename)
+            file.save(filepath)
+            photos[key] = filepath
+
     record = {
-        'cpf': data.get('cpf'),
+        'cpf': cpf,
         'requester_name': data.get('requester_name'),
         'driver_name': data.get('driver_name'),
         'date': data.get('date'),
@@ -73,6 +83,10 @@ def submit_initial():
         'origin': data.get('origin'),
         'initial_tank_level': data.get('initial_tank_level'),
         'destination': data.get('destination'),
+        'car_status': data.get('car_status'),
+        'initial_km_photo': photos.get('initial_km_photo'),
+        'initial_tank_photo': photos.get('initial_tank_photo'),
+        'car_status_photo': photos.get('car_status_photo'),
         'status': 'initial'
     }
     # Insert into Supabase
@@ -88,6 +102,10 @@ def submit_initial():
                 'origin': record['origin'],
                 'initial_tank_level': record['initial_tank_level'],
                 'destination': record['destination'],
+                'car_status': record['car_status'],
+                'initial_km_photo': record['initial_km_photo'],
+                'initial_tank_photo': record['initial_tank_photo'],
+                'car_status_photo': record['car_status_photo'],
                 'status': 'initial'
             }).execute()
         except Exception as e:
@@ -100,8 +118,17 @@ def submit_initial():
 
 @app.route('/submit_final', methods=['POST'])
 def submit_final():
-    data = request.get_json()
+    data = request.form.to_dict()
     cpf = data.get('cpf')
+    photos = {}
+    for key in request.files:
+        file = request.files[key]
+        if file and file.filename:
+            filename = f"{cpf}_{key}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg"
+            filepath = os.path.join('static', 'photos', filename)
+            file.save(filepath)
+            photos[key] = filepath
+
     # Update in Supabase
     if supabase:
         try:
@@ -109,6 +136,8 @@ def submit_final():
                 'final_km': data.get('final_km'),
                 'arrival_time': data.get('arrival_time'),
                 'final_tank_level': data.get('final_tank_level'),
+                'final_km_photo': photos.get('final_km_photo'),
+                'final_tank_photo': photos.get('final_tank_photo'),
                 'status': 'complete'
             }).eq('cpf', cpf).eq('status', 'initial').execute()
         except Exception as e:
@@ -121,6 +150,8 @@ def submit_final():
                 'final_km': data.get('final_km'),
                 'arrival_time': data.get('arrival_time'),
                 'final_tank_level': data.get('final_tank_level'),
+                'final_km_photo': photos.get('final_km_photo'),
+                'final_tank_photo': photos.get('final_tank_photo'),
                 'status': 'complete'
             })
             break

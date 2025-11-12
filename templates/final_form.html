@@ -37,6 +37,40 @@
       flex-direction: column;
     }
 
+    .photo-section {
+      display: flex;
+      flex-direction: column;
+      margin-top: 10px;
+    }
+
+    .photo-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 5px;
+    }
+
+    .photo-buttons button {
+      padding: 8px 12px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .photo-buttons button:hover {
+      background-color: #0056b3;
+    }
+
+    .photo-preview {
+      margin-top: 10px;
+      max-width: 200px;
+      max-height: 150px;
+      border: 1px solid #ccc;
+      display: none;
+    }
+
     label {
       margin-top: 12px;
       font-weight: bold;
@@ -138,7 +172,7 @@ input[type="time"]:focus {
 <body>
   <div class="container">
     <h1>Controle de Carro - Chegada</h1>
-    <form id="finalForm">
+    <form id="finalForm" enctype="multipart/form-data">
       <input type="hidden" id="cpf" name="cpf" value="{{ cpf }}">
 
       <label for="requester_name">Nome do Solicitante:</label>
@@ -167,12 +201,30 @@ input[type="time"]:focus {
 
       <label for="final_km">Km Final:</label>
       <input type="number" id="final_km" name="final_km" required>
+      <div class="photo-section">
+        <label>Foto do Km Final:</label>
+        <div class="photo-buttons">
+          <button type="button" onclick="takePhoto('final_km')">Tirar Foto</button>
+          <input type="file" id="final_km_file" name="final_km_photo" accept="image/*" style="display: none;">
+          <button type="button" onclick="document.getElementById('final_km_file').click()">Escolher Foto</button>
+        </div>
+        <img id="final_km_preview" class="photo-preview" alt="Preview">
+      </div>
 
       <label for="arrival_time">Hora de Chegada:</label>
       <input type="time" id="arrival_time" name="arrival_time" required>
 
       <label for="final_tank_level">Nível Final do Tanque (Litros):</label>
       <input type="number" id="final_tank_level" name="final_tank_level" min="0" max="100" required>
+      <div class="photo-section">
+        <label>Foto do Nível Final do Tanque:</label>
+        <div class="photo-buttons">
+          <button type="button" onclick="takePhoto('final_tank')">Tirar Foto</button>
+          <input type="file" id="final_tank_file" name="final_tank_photo" accept="image/*" style="display: none;">
+          <button type="button" onclick="document.getElementById('final_tank_file').click()">Escolher Foto</button>
+        </div>
+        <img id="final_tank_preview" class="photo-preview" alt="Preview">
+      </div>
 
       <button type="submit">Salvar Chegada</button>
     </form>
@@ -182,20 +234,64 @@ input[type="time"]:focus {
   </div>
 
   <script>
+    function takePhoto(field) {
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then(function(stream) {
+          const video = document.createElement('video');
+          video.srcObject = stream;
+          video.play();
+          const canvas = document.createElement('canvas');
+          canvas.width = 640;
+          canvas.height = 480;
+          const context = canvas.getContext('2d');
+          video.addEventListener('loadedmetadata', function() {
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            canvas.toBlob(function(blob) {
+              const file = new File([blob], `${field}_photo.jpg`, { type: 'image/jpeg' });
+              const dataTransfer = new DataTransfer();
+              dataTransfer.items.add(file);
+              document.getElementById(`${field}_file`).files = dataTransfer.files;
+              document.getElementById(`${field}_preview`).src = URL.createObjectURL(blob);
+              document.getElementById(`${field}_preview`).style.display = 'block';
+              stream.getTracks().forEach(track => track.stop());
+            }, 'image/jpeg');
+          });
+        })
+        .catch(function(err) {
+          alert('Erro ao acessar câmera: ' + err.message);
+        });
+    }
+
+    document.getElementById('final_km_file').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        document.getElementById('final_km_preview').src = URL.createObjectURL(file);
+        document.getElementById('final_km_preview').style.display = 'block';
+      }
+    });
+
+    document.getElementById('final_tank_file').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        document.getElementById('final_tank_preview').src = URL.createObjectURL(file);
+        document.getElementById('final_tank_preview').style.display = 'block';
+      }
+    });
+
     document.getElementById('finalForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const formData = new FormData(e.target);
-      const data = Object.fromEntries(formData);
       fetch('/submit_final', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: formData,
       })
       .then(response => response.json())
       .then(data => {
         if (data.status === 'ok') {
           alert('Chegada salva com sucesso!');
           e.target.reset();
+          // Hide previews
+          document.querySelectorAll('.photo-preview').forEach(img => img.style.display = 'none');
         } else {
           alert('Erro ao salvar chegada.');
         }

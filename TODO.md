@@ -1,0 +1,6 @@
+- [x] Update initial_form.html: Add car_status field, photo inputs for initial_km and initial_tank_level with take/upload buttons, change form to multipart, update JS to use FormData.
+- [x] Update final_form.html: Add photo inputs for final_km and final_tank_level with take/upload buttons, change form to multipart, update JS to use FormData.
+- [x] Update app.py: Modify submit_initial and submit_final to handle files, save photos, update records with photo paths and car_status, update Supabase.
+- [x] Create static/photos/ directory.
+- [] Test the forms to ensure photos are captured/uploaded and saved correctly.
+- [] Update Excel download to include new fields if needed.
