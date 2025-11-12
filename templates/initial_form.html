@@ -48,6 +48,7 @@
       display: flex;
       gap: 10px;
       margin-top: 5px;
+      flex-wrap: wrap;
     }
 
     .photo-buttons button {
@@ -184,7 +185,8 @@ input[type="time"]:focus {
       <div class="photo-section">
         <label>Foto do Km Inicial:</label>
         <div class="photo-buttons">
-          <button type="button" onclick="takePhoto('initial_km')">Tirar Foto</button>
+          <button type="button" onclick="takePhoto('initial_km', 'environment')">Tirar Foto (Traseira)</button>
+          <button type="button" onclick="takePhoto('initial_km', 'user')">Tirar Foto (Frontal)</button>
           <input type="file" id="initial_km_file" name="initial_km_photo" accept="image/*" style="display: none;">
           <button type="button" onclick="document.getElementById('initial_km_file').click()">Escolher Foto</button>
         </div>
@@ -202,7 +204,8 @@ input[type="time"]:focus {
       <div class="photo-section">
         <label>Foto do Nível Inicial do Tanque:</label>
         <div class="photo-buttons">
-          <button type="button" onclick="takePhoto('initial_tank')">Tirar Foto</button>
+          <button type="button" onclick="takePhoto('initial_tank', 'environment')">Tirar Foto (Traseira)</button>
+          <button type="button" onclick="takePhoto('initial_tank', 'user')">Tirar Foto (Frontal)</button>
           <input type="file" id="initial_tank_file" name="initial_tank_photo" accept="image/*" style="display: none;">
           <button type="button" onclick="document.getElementById('initial_tank_file').click()">Escolher Foto</button>
         </div>
@@ -214,7 +217,8 @@ input[type="time"]:focus {
       <div class="photo-section">
         <label>Foto do Estado do Carro:</label>
         <div class="photo-buttons">
-          <button type="button" onclick="takePhoto('car_status')">Tirar Foto</button>
+          <button type="button" onclick="takePhoto('car_status', 'environment')">Tirar Foto (Traseira)</button>
+          <button type="button" onclick="takePhoto('car_status', 'user')">Tirar Foto (Frontal)</button>
           <input type="file" id="car_status_file" name="car_status_photo" accept="image/*" style="display: none;">
           <button type="button" onclick="document.getElementById('car_status_file').click()">Escolher Foto</button>
         </div>
@@ -232,8 +236,8 @@ input[type="time"]:focus {
   </div>
 
   <script>
-    function takePhoto(field) {
-      navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+    function takePhoto(field, facingMode = 'environment') {
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: facingMode } })
         .then(function(stream) {
           const video = document.createElement('video');
           video.srcObject = stream;
@@ -256,7 +260,7 @@ input[type="time"]:focus {
           });
         })
         .catch(function(err) {
-          alert('Erro ao acessar câmera traseira: ' + err.message);
+          alert('Erro ao acessar câmera: ' + err.message);
         });
     }
 
