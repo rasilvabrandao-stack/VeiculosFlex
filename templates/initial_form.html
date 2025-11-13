@@ -87,6 +87,15 @@
       font-size: 0.95rem;
     }
 
+    textarea {
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      resize: vertical;
+    }
+
     button {
       margin-top: 25px;
       padding: 12px;
@@ -171,14 +180,17 @@ input[type="time"]:focus {
     <form id="initialForm" enctype="multipart/form-data">
       <input type="hidden" id="cpf" name="cpf" value="{{ cpf }}">
 
-      <label for="requester_name">Nome do Solicitante:</label>
+      <label for="requester_name">Nome do Autorizador:</label>
       <input type="text" id="requester_name" name="requester_name" required>
+
+      <label for="reason">Motivo:</label>
+      <input type="text" id="reason" name="reason" required>
 
       <label for="driver_name">Nome do Motorista:</label>
       <input type="text" id="driver_name" name="driver_name" value="{{ driver_name }}" required>
 
-      <label for="date">Data:</label>
-      <input type="date" id="date" name="date" required>
+      <label for="date_time">Data e Horário de Saída:</label>
+      <input type="text" id="date_time" name="date_time" readonly>
 
       <div class="photo-section">
         <label>Foto do Km Inicial:</label>
@@ -189,9 +201,6 @@ input[type="time"]:focus {
         </div>
         <img id="initial_km_preview" class="photo-preview" alt="Preview">
       </div>
-
-      <label for="departure_time">Horário de Saída:</label>
-      <input type="time" id="departure_time" name="departure_time" required>
 
       <label for="origin">Endereço de Origem:</label>
       <input type="text" id="origin" name="origin" required>
@@ -220,6 +229,9 @@ input[type="time"]:focus {
 
       <label for="destination">Endereço de Destino:</label>
       <input type="text" id="destination" name="destination" required>
+
+      <label for="observations">Observações:</label>
+      <textarea id="observations" name="observations" rows="4"></textarea>
 
       <button type="submit">Salvar Saída</button>
     </form>
@@ -279,6 +291,20 @@ input[type="time"]:focus {
         document.getElementById('car_status_preview').src = URL.createObjectURL(file);
         document.getElementById('car_status_preview').style.display = 'block';
       }
+    });
+
+    // Set current date and time on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      const now = new Date();
+      const dateTimeString = now.toLocaleString('pt-BR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+      document.getElementById('date_time').value = dateTimeString;
     });
 
     document.getElementById('initialForm').addEventListener('submit', function(e) {
