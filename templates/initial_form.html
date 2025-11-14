@@ -23,7 +23,7 @@
       padding: 20px;
       border-radius: 12px;
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
-      margin: 20px;
+      margin: 20px auto;
     }
 
     h1 {
@@ -192,48 +192,52 @@ input[type="time"]:focus {
       <label for="date_time">Data e Horário de Saída:</label>
       <input type="text" id="date_time" name="date_time" readonly>
 
+      <label for="initial_km">Km Inicial:</label>
+      <input type="number" id="initial_km" name="initial_km" required>
+
+     <label for="origin">Endereço de Origem:</label>
+      <input type="text" id="origin" name="origin" required>
+
+     <label for="car_status">Estado do Carro:</label>
+      <input type="text" id="car_status" name="car_status" required>
+
+      <label for="destination">Endereço de Destino:</label>
+      <input type="text" id="destination" name="destination" required>
+
       <div class="photo-section">
         <label>Foto do Km Inicial:</label>
         <div class="photo-buttons">
           <button type="button" onclick="takePhoto('initial_km')">Tirar Foto</button>
           <input type="file" id="initial_km_file" name="initial_km_photo" accept="image/*" style="display: none;">
-          <button type="button" onclick="document.getElementById('initial_km_file').click()">Escolher Foto</button>
         </div>
         <img id="initial_km_preview" class="photo-preview" alt="Preview">
       </div>
-
-      <label for="origin">Endereço de Origem:</label>
-      <input type="text" id="origin" name="origin" required>
 
       <div class="photo-section">
         <label>Foto do Nível Inicial do Tanque:</label>
         <div class="photo-buttons">
           <button type="button" onclick="takePhoto('initial_tank')">Tirar Foto</button>
           <input type="file" id="initial_tank_file" name="initial_tank_photo" accept="image/*" style="display: none;">
-          <button type="button" onclick="document.getElementById('initial_tank_file').click()">Escolher Foto</button>
         </div>
         <img id="initial_tank_preview" class="photo-preview" alt="Preview">
       </div>
 
-      <label for="car_status">Estado do Carro:</label>
-      <input type="text" id="car_status" name="car_status" required>
       <div class="photo-section">
         <label>Foto do Estado do Carro:</label>
         <div class="photo-buttons">
           <button type="button" onclick="takePhoto('car_status')">Tirar Foto</button>
           <input type="file" id="car_status_file" name="car_status_photo" accept="image/*" style="display: none;">
-          <button type="button" onclick="document.getElementById('car_status_file').click()">Escolher Foto</button>
         </div>
         <img id="car_status_preview" class="photo-preview" alt="Preview">
       </div>
-
-      <label for="destination">Endereço de Destino:</label>
-      <input type="text" id="destination" name="destination" required>
-
+      
       <label for="observations">Observações:</label>
       <textarea id="observations" name="observations" rows="4"></textarea>
 
-      <button type="submit">Salvar Saída</button>
+      <div style="display: flex; gap: 10px; margin-top: 25px;">
+        <button type="submit">Salvar Saída</button>
+        <button type="button" onclick="window.location.href='/'" style="background-color: #f44336;">Sair</button>
+      </div>
     </form>
 
     <p class="alerta">⚠ Mande foto do carro no momento de saída e chegada no número abaixo ⚠</p>

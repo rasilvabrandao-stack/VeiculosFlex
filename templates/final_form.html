@@ -175,54 +175,34 @@ input[type="time"]:focus {
     <form id="finalForm" enctype="multipart/form-data">
       <input type="hidden" id="cpf" name="cpf" value="{{ cpf }}">
 
-      <label for="requester_name">Nome do Solicitante:</label>
-      <input type="text" id="requester_name" name="requester_name" value="{{ record.requester_name }}" readonly>
+      <label for="final_km">Km Final:</label>
+      <input type="number" id="final_km" name="final_km" required>
 
-      <label for="driver_name">Nome do Motorista:</label>
-      <input type="text" id="driver_name" name="driver_name" value="{{ record.driver_name }}" readonly>
-
-      <label for="date">Data:</label>
-      <input type="date" id="date" name="date" value="{{ record.date }}" readonly>
-
-      <label for="initial_km">Km Inicial:</label>
-      <input type="number" id="initial_km" name="initial_km" value="{{ record.initial_km }}" readonly>
-
-      <label for="departure_time">Horário de Saída:</label>
-      <input type="time" id="departure_time" name="departure_time" value="{{ record.departure_time }}" readonly>
-
-      <label for="origin">Endereço de Origem:</label>
-      <input type="text" id="origin" name="origin" value="{{ record.origin }}" readonly>
-
-      <label for="initial_tank_level">Nível Inicial do Tanque (Litros):</label>
-      <input type="number" id="initial_tank_level" name="initial_tank_level" value="{{ record.initial_tank_level }}" readonly>
-
-      <label for="destination">Endereço de Destino:</label>
-      <input type="text" id="destination" name="destination" value="{{ record.destination }}" readonly>
+      <label for="arrival_time">Data e Hora de Chegada:</label>
+      <input type="text" id="arrival_time" name="arrival_time" readonly>
 
       <div class="photo-section">
         <label>Foto do Km Final:</label>
         <div class="photo-buttons">
           <button type="button" onclick="takePhoto('final_km')">Tirar Foto</button>
-          <input type="file" id="final_km_file" name="final_km_photo" accept="image/*" style="display: none;">
-          <button type="button" onclick="document.getElementById('final_km_file').click()">Escolher Foto</button>
         </div>
         <img id="final_km_preview" class="photo-preview" alt="Preview">
       </div>
-
-      <label for="arrival_time">Hora de Chegada:</label>
-      <input type="time" id="arrival_time" name="arrival_time" required>
 
       <div class="photo-section">
         <label>Foto do Nível Final do Tanque:</label>
         <div class="photo-buttons">
           <button type="button" onclick="takePhoto('final_tank')">Tirar Foto</button>
-          <input type="file" id="final_tank_file" name="final_tank_photo" accept="image/*" style="display: none;">
-          <button type="button" onclick="document.getElementById('final_tank_file').click()">Escolher Foto</button>
         </div>
         <img id="final_tank_preview" class="photo-preview" alt="Preview">
       </div>
+       <label for="observations">Observações:</label>
+      <textarea id="observations" name="observations" rows="4"></textarea>
 
-      <button type="submit">Salvar Chegada</button>
+      <div style="display: flex; gap: 10px; margin-top: 25px;">
+        <button type="submit">Salvar Chegada</button>
+        <button type="button" onclick="window.location.href='/'" style="background-color: #f44336;">Sair</button>
+      </div>
     </form>
 
     <p class="alerta">⚠ Mande foto do carro no momento de saída e chegada no número abaixo ⚠</p>
@@ -258,20 +238,20 @@ input[type="time"]:focus {
         });
     }
 
-    document.getElementById('final_km_file').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        document.getElementById('final_km_preview').src = URL.createObjectURL(file);
-        document.getElementById('final_km_preview').style.display = 'block';
-      }
-    });
 
-    document.getElementById('final_tank_file').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        document.getElementById('final_tank_preview').src = URL.createObjectURL(file);
-        document.getElementById('final_tank_preview').style.display = 'block';
-      }
+
+    // Set current date and time on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      const now = new Date();
+      const dateTimeString = now.toLocaleString('pt-BR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+      document.getElementById('arrival_time').value = dateTimeString;
     });
 
     document.getElementById('finalForm').addEventListener('submit', function(e) {

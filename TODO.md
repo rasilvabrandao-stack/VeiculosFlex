@@ -1,6 +1,6 @@
-- [x] Update initial_form.html: Add car_status field, photo inputs for initial_km and initial_tank_level with take/upload buttons, change form to multipart, update JS to use FormData.
-- [x] Update final_form.html: Add photo inputs for final_km and final_tank_level with take/upload buttons, change form to multipart, update JS to use FormData.
-- [x] Update app.py: Modify submit_initial and submit_final to handle files, save photos, update records with photo paths and car_status, update Supabase.
-- [x] Create static/photos/ directory.
-- [] Test the forms to ensure photos are captured/uploaded and saved correctly.
-- [] Update Excel download to include new fields if needed.
+- [x] Adicionar campo de input para "Km Inicial" no templates/initial_form.html antes da seção de foto do km inicial
+- [x] Remover campo readonly de km inicial no templates/final_form.html e adicionar campo editável para km final
+- [x] Remover campos desnecessários do templates/final_form.html: Nome do Solicitante, Data, Endereço de Origem
+- [x] Tornar Hora de Chegada automática no templates/final_form.html
+- [x] Mover campo Km Final acima da foto no templates/final_form.html
+- [x] Remover opção de escolher foto, manter apenas tirar foto no templates/final_form.html
