@@ -251,6 +251,10 @@ def admin_dashboard():
         all_records = [r for r in records if r.get('status') in ['initial', 'complete']]
     return render_template('admin_dashboard.html', records=all_records)
 
+@app.route('/photos/<filename>')
+def get_photo(filename):
+    return send_from_directory(os.path.join('static', 'photos'), filename)
+
 @app.route('/download_excel')
 def download_excel():
     if supabase:
