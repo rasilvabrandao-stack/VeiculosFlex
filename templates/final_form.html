@@ -267,7 +267,7 @@ input[type="time"]:focus {
       .then(response => response.json())
       .then(data => {
         if (data.status === 'ok') {
-          alert('Chegada salva com sucesso!');
+          alert('Salvo com sucesso!');
           e.target.reset();
           // Hide previews
           document.querySelectorAll('.photo-preview').forEach(img => img.style.display = 'none');

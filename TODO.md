@@ -3,4 +3,5 @@
 - [x] Fornecer código Google Apps Script para envio de emails
 - [x] Instruir sobre criação e deploy do Apps Script
 - [x] Adicionar URL do Apps Script no app.py
+- [x] Alterar mensagens de sucesso para "Salvo com sucesso!"
 - [ ] Testar emails
