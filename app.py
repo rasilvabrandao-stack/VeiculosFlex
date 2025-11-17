@@ -66,121 +66,135 @@ def form(cpf):
 
 @app.route('/submit_initial', methods=['POST'])
 def submit_initial():
-    data = request.form.to_dict()
-    cpf = data.get('cpf')
-    photos = {}
-    for key in request.files:
-        file = request.files[key]
-        if file and file.filename:
-            filename = f"{cpf}_{key}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg"
-            filepath = os.path.join('static', 'photos', filename)
-            file.save(filepath)
-            photos[key] = filepath
-
-    record = {
-        'cpf': cpf,
-        'requester_name': data.get('requester_name'),
-        'driver_name': data.get('driver_name'),
-        'date': data.get('date'),
-        'initial_km': data.get('initial_km'),
-        'departure_time': data.get('departure_time'),
-        'origin': data.get('origin'),
-        'initial_tank_level': data.get('initial_tank_level'),
-        'destination': data.get('destination'),
-        'car_status': data.get('car_status'),
-        'initial_km_photo': photos.get('initial_km_photo'),
-        'initial_tank_photo': photos.get('initial_tank_photo'),
-        'car_status_photo': photos.get('car_status_photo'),
-        'status': 'initial'
-    }
-    # Insert into Supabase
-    if supabase:
-        try:
-            supabase.table('registros').insert({
-                'cpf': record['cpf'],
-                'requester_name': record['requester_name'],
-                'driver_name': record['driver_name'],
-                'date': record['date'],
-                'initial_km': record['initial_km'],
-                'departure_time': record['departure_time'],
-                'origin': record['origin'],
-                'initial_tank_level': record['initial_tank_level'],
-                'destination': record['destination'],
-                'car_status': record['car_status'],
-                'initial_km_photo': record['initial_km_photo'],
-                'initial_tank_photo': record['initial_tank_photo'],
-                'car_status_photo': record['car_status_photo'],
-                'status': 'initial'
-            }).execute()
-        except Exception as e:
-            return jsonify({"status": "error", "message": f"Erro ao salvar no Supabase: {str(e)}"})
-
-    records = load_car_records()
-    records.append(record)
-    save_car_records(records)
-
-    # Send email notification for initial save
     try:
-        payload = {
-            "type": "initial",
-            "data": record
-        }
-        requests.post(APPS_SCRIPT_URL, json=payload, timeout=10)
-    except Exception as e:
-        print(f"Erro ao enviar email para save inicial: {e}")
+        data = request.form.to_dict()
+        cpf = data.get('cpf')
+        photos = {}
+        for key in request.files:
+            file = request.files[key]
+            if file and file.filename:
+                filename = f"{cpf}_{key}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg"
+                filepath = os.path.join('static', 'photos', filename)
+                os.makedirs(os.path.dirname(filepath), exist_ok=True)
+                file.save(filepath)
+                photos[key] = filepath
 
-    return jsonify({"status": "ok"})
+        record = {
+            'cpf': cpf,
+            'requester_name': data.get('requester_name'),
+            'driver_name': data.get('driver_name'),
+            'date': data.get('date_time'),  # Changed from 'date' to 'date_time' to match form
+            'initial_km': data.get('initial_km'),
+            'departure_time': data.get('departure_time'),
+            'origin': data.get('origin'),
+            'initial_tank_level': data.get('initial_tank_level'),
+            'destination': data.get('destination'),
+            'car_status': data.get('car_status'),
+            'initial_km_photo': photos.get('initial_km_photo'),
+            'initial_tank_photo': photos.get('initial_tank_photo'),
+            'car_status_photo': photos.get('car_status_photo'),
+            'status': 'initial'
+        }
+        # Insert into Supabase
+        if supabase:
+            try:
+                supabase.table('registros').insert({
+                    'cpf': record['cpf'],
+                    'requester_name': record['requester_name'],
+                    'driver_name': record['driver_name'],
+                    'date': record['date'],
+                    'initial_km': record['initial_km'],
+                    'departure_time': record['departure_time'],
+                    'origin': record['origin'],
+                    'initial_tank_level': record['initial_tank_level'],
+                    'destination': record['destination'],
+                    'car_status': record['car_status'],
+                    'initial_km_photo': record['initial_km_photo'],
+                    'initial_tank_photo': record['initial_tank_photo'],
+                    'car_status_photo': record['car_status_photo'],
+                    'status': 'initial'
+                }).execute()
+            except Exception as e:
+                print(f"Erro ao salvar no Supabase: {str(e)}")
+                # Continue without Supabase if it fails
+
+        records = load_car_records()
+        records.append(record)
+        save_car_records(records)
+
+        # Send email notification for initial save
+        try:
+            payload = {
+                "type": "initial",
+                "data": record
+            }
+            response = requests.post(APPS_SCRIPT_URL, json=payload, timeout=10)
+            print(f"Email response status: {response.status_code}")
+        except Exception as e:
+            print(f"Erro ao enviar email para save inicial: {e}")
+
+        return jsonify({"status": "ok"})
+    except Exception as e:
+        print(f"Erro geral no submit_initial: {str(e)}")
+        return jsonify({"status": "error", "message": f"Erro interno: {str(e)}"}), 500
 
 @app.route('/submit_final', methods=['POST'])
 def submit_final():
-    data = request.form.to_dict()
-    cpf = data.get('cpf')
-    photos = {}
-    for key in request.files:
-        file = request.files[key]
-        if file and file.filename:
-            filename = f"{cpf}_{key}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg"
-            filepath = os.path.join('static', 'photos', filename)
-            file.save(filepath)
-            photos[key] = filepath
+    try:
+        data = request.form.to_dict()
+        cpf = data.get('cpf')
+        photos = {}
+        for key in request.files:
+            file = request.files[key]
+            if file and file.filename:
+                filename = f"{cpf}_{key}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg"
+                filepath = os.path.join('static', 'photos', filename)
+                os.makedirs(os.path.dirname(filepath), exist_ok=True)
+                file.save(filepath)
+                photos[key] = filepath
 
-    # Update in Supabase
-    if supabase:
-        try:
-            supabase.table('registros').update({
-                'final_km': data.get('final_km'),
-                'arrival_time': data.get('arrival_time'),
-                'final_tank_level': data.get('final_tank_level'),
-                'final_km_photo': photos.get('final_km_photo'),
-                'final_tank_photo': photos.get('final_tank_photo'),
-                'status': 'complete'
-            }).eq('cpf', cpf).eq('status', 'initial').execute()
-        except Exception as e:
-            return jsonify({"status": "error", "message": f"Erro ao atualizar no Supabase: {str(e)}"})
-
-    records = load_car_records()
-    for record in records:
-        if record.get('cpf') == cpf and record.get('status') == 'initial':
-            record.update({
-                'final_km': data.get('final_km'),
-                'arrival_time': data.get('arrival_time'),
-                'final_tank_level': data.get('final_tank_level'),
-                'final_km_photo': photos.get('final_km_photo'),
-                'final_tank_photo': photos.get('final_tank_photo'),
-                'status': 'complete'
-            })
-            # Send email notification for final save
+        # Update in Supabase
+        if supabase:
             try:
-                payload = {
-                    "type": "final",
-                    "data": record
-                }
-                requests.post(APPS_SCRIPT_URL, json=payload, timeout=10)
+                supabase.table('registros').update({
+                    'final_km': data.get('final_km'),
+                    'arrival_time': data.get('arrival_time'),
+                    'final_tank_level': data.get('final_tank_level'),
+                    'final_km_photo': photos.get('final_km_photo'),
+                    'final_tank_photo': photos.get('final_tank_photo'),
+                    'status': 'complete'
+                }).eq('cpf', cpf).eq('status', 'initial').execute()
             except Exception as e:
-                print(f"Erro ao enviar email para save final: {e}")
-            break
-    save_car_records(records)
-    return jsonify({"status": "ok"})
+                print(f"Erro ao atualizar no Supabase: {str(e)}")
+                # Continue without Supabase if it fails
+
+        records = load_car_records()
+        for record in records:
+            if record.get('cpf') == cpf and record.get('status') == 'initial':
+                record.update({
+                    'final_km': data.get('final_km'),
+                    'arrival_time': data.get('arrival_time'),
+                    'final_tank_level': data.get('final_tank_level'),
+                    'final_km_photo': photos.get('final_km_photo'),
+                    'final_tank_photo': photos.get('final_tank_photo'),
+                    'status': 'complete'
+                })
+                # Send email notification for final save
+                try:
+                    payload = {
+                        "type": "final",
+                        "data": record
+                    }
+                    response = requests.post(APPS_SCRIPT_URL, json=payload, timeout=10)
+                    print(f"Email response status: {response.status_code}")
+                except Exception as e:
+                    print(f"Erro ao enviar email para save final: {e}")
+                break
+        save_car_records(records)
+        return jsonify({"status": "ok"})
+    except Exception as e:
+        print(f"Erro geral no submit_final: {str(e)}")
+        return jsonify({"status": "error", "message": f"Erro interno: {str(e)}"}), 500
 
 @app.route('/view_records')
 def view_records():
