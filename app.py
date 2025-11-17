@@ -22,7 +22,7 @@ except Exception as e:
     supabase = None
 
 # Google Apps Script URL for email notifications
-APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzOA_BkwPcKwTJQooGWISHUnPu6st1gSpf-Ov7RBA2_CrPxb2PRyhA_jckdZTmeYzd9Kw/exec"
+APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwvBLDhtFUzzQ1u5iT-kZ_TZUpz8y2yg_qG3LLiwMfRDtDChgHXkYM_HoF19kXFSl5aXg/exec"
 
 # Base URL for the deployed app (update this with your Render URL)
 BASE_URL = "https://veiculosflex.onrender.com"
