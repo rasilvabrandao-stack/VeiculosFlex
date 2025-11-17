@@ -24,6 +24,9 @@ except Exception as e:
 # Google Apps Script URL for email notifications
 APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzOA_BkwPcKwTJQooGWISHUnPu6st1gSpf-Ov7RBA2_CrPxb2PRyhA_jckdZTmeYzd9Kw/exec"
 
+# Base URL for the deployed app (update this with your Render URL)
+BASE_URL = "https://veiculosflex.onrender.com"
+
 def load_car_records():
     if not os.path.exists(CAR_RECORDS_FILE):
         return []
@@ -90,6 +93,7 @@ def submit_initial():
             'initial_tank_level': data.get('initial_tank_level'),
             'destination': data.get('destination'),
             'car_status': data.get('car_status'),
+            'observations': data.get('observations'),
             'initial_km_photo': photos.get('initial_km_photo'),
             'initial_tank_photo': photos.get('initial_tank_photo'),
             'car_status_photo': photos.get('car_status_photo'),
@@ -124,9 +128,15 @@ def submit_initial():
 
         # Send email notification for initial save
         try:
+            # Convert photo paths to URLs
+            email_record = record.copy()
+            for key in ['initial_km_photo', 'initial_tank_photo', 'car_status_photo']:
+                if email_record.get(key):
+                    email_record[key] = f"{BASE_URL}{email_record[key]}"
+
             payload = {
                 "type": "initial",
-                "data": record
+                "data": email_record
             }
             response = requests.post(APPS_SCRIPT_URL, json=payload, timeout=10)
             print(f"Email response status: {response.status_code}")
@@ -175,15 +185,22 @@ def submit_final():
                     'final_km': data.get('final_km'),
                     'arrival_time': data.get('arrival_time'),
                     'final_tank_level': data.get('final_tank_level'),
+                    'observations': data.get('observations'),
                     'final_km_photo': photos.get('final_km_photo'),
                     'final_tank_photo': photos.get('final_tank_photo'),
                     'status': 'complete'
                 })
                 # Send email notification for final save
                 try:
+                    # Convert photo paths to URLs
+                    email_record = record.copy()
+                    for key in ['initial_km_photo', 'initial_tank_photo', 'car_status_photo', 'final_km_photo', 'final_tank_photo']:
+                        if email_record.get(key):
+                            email_record[key] = f"{BASE_URL}{email_record[key]}"
+
                     payload = {
                         "type": "final",
-                        "data": record
+                        "data": email_record
                     }
                     response = requests.post(APPS_SCRIPT_URL, json=payload, timeout=10)
                     print(f"Email response status: {response.status_code}")
