@@ -7,6 +7,8 @@ import openpyxl
 from openpyxl.styles import Font, Alignment, Border, Side
 from supabase import create_client, Client
 import requests
+from PIL import Image
+import io
 
 app = Flask(__name__)
 
@@ -76,11 +78,32 @@ def submit_initial():
         for key in request.files:
             file = request.files[key]
             if file and file.filename:
+                # Upload to Supabase Storage
                 filename = f"{cpf}_{key}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg"
-                filepath = os.path.join('static', 'photos', filename)
-                os.makedirs(os.path.dirname(filepath), exist_ok=True)
-                file.save(filepath)
-                photos[key] = filepath
+                file_content = file.read()
+                # Convert to PIL Image to ensure it's a valid image
+                try:
+                    image = Image.open(io.BytesIO(file_content))
+                    # Convert to RGB if necessary
+                    if image.mode != 'RGB':
+                        image = image.convert('RGB')
+                    # Save to BytesIO
+                    output = io.BytesIO()
+                    image.save(output, format='JPEG')
+                    file_content = output.getvalue()
+                except Exception as e:
+                    print(f"Erro ao processar imagem {key}: {e}")
+                    continue
+
+                if supabase:
+                    try:
+                        bucket_name = 'photos'
+                        supabase.storage.from_(bucket_name).upload(filename, file_content, {"content-type": "image/jpeg"})
+                        photo_url = supabase.storage.from_(bucket_name).get_public_url(filename)
+                        photos[key] = photo_url
+                    except Exception as e:
+                        print(f"Erro ao fazer upload para Supabase Storage: {str(e)}")
+                        continue
 
         record = {
             'cpf': cpf,
@@ -113,6 +136,7 @@ def submit_initial():
                     'initial_tank_level': record['initial_tank_level'],
                     'destination': record['destination'],
                     'car_status': record['car_status'],
+                    'observations': record['observations'],
                     'initial_km_photo': record['initial_km_photo'],
                     'initial_tank_photo': record['initial_tank_photo'],
                     'car_status_photo': record['car_status_photo'],
@@ -128,15 +152,9 @@ def submit_initial():
 
         # Send email notification for initial save
         try:
-            # Convert photo paths to URLs
-            email_record = record.copy()
-            for key in ['initial_km_photo', 'initial_tank_photo', 'car_status_photo']:
-                if email_record.get(key):
-                    email_record[key] = f"{BASE_URL}/{email_record[key]}"
-
             payload = {
                 "type": "initial",
-                "data": email_record
+                "data": record
             }
             response = requests.post(APPS_SCRIPT_URL, json=payload, timeout=10)
             print(f"Email response status: {response.status_code}")
@@ -157,11 +175,32 @@ def submit_final():
         for key in request.files:
             file = request.files[key]
             if file and file.filename:
+                # Upload to Supabase Storage
                 filename = f"{cpf}_{key}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg"
-                filepath = os.path.join('static', 'photos', filename)
-                os.makedirs(os.path.dirname(filepath), exist_ok=True)
-                file.save(filepath)
-                photos[key] = filepath
+                file_content = file.read()
+                # Convert to PIL Image to ensure it's a valid image
+                try:
+                    image = Image.open(io.BytesIO(file_content))
+                    # Convert to RGB if necessary
+                    if image.mode != 'RGB':
+                        image = image.convert('RGB')
+                    # Save to BytesIO
+                    output = io.BytesIO()
+                    image.save(output, format='JPEG')
+                    file_content = output.getvalue()
+                except Exception as e:
+                    print(f"Erro ao processar imagem {key}: {e}")
+                    continue
+
+                if supabase:
+                    try:
+                        bucket_name = 'photos'
+                        supabase.storage.from_(bucket_name).upload(filename, file_content, {"content-type": "image/jpeg"})
+                        photo_url = supabase.storage.from_(bucket_name).get_public_url(filename)
+                        photos[key] = photo_url
+                    except Exception as e:
+                        print(f"Erro ao fazer upload para Supabase Storage: {str(e)}")
+                        continue
 
         # Update in Supabase
         if supabase:
@@ -170,6 +209,7 @@ def submit_final():
                     'final_km': data.get('final_km'),
                     'arrival_time': data.get('arrival_time'),
                     'final_tank_level': data.get('final_tank_level'),
+                    'observations': data.get('observations'),
                     'final_km_photo': photos.get('final_km_photo'),
                     'final_tank_photo': photos.get('final_tank_photo'),
                     'status': 'complete'
@@ -192,15 +232,9 @@ def submit_final():
                 })
                 # Send email notification for final save
                 try:
-                    # Convert photo paths to URLs
-                    email_record = record.copy()
-                    for key in ['initial_km_photo', 'initial_tank_photo', 'car_status_photo', 'final_km_photo', 'final_tank_photo']:
-                        if email_record.get(key):
-                            email_record[key] = f"{BASE_URL}/{email_record[key]}"
-
                     payload = {
                         "type": "final",
-                        "data": email_record
+                        "data": record
                     }
                     response = requests.post(APPS_SCRIPT_URL, json=payload, timeout=10)
                     print(f"Email response status: {response.status_code}")
