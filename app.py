@@ -6,6 +6,7 @@ from io import BytesIO
 import openpyxl
 from openpyxl.styles import Font, Alignment, Border, Side
 from supabase import create_client, Client
+import requests
 
 app = Flask(__name__)
 
@@ -19,6 +20,9 @@ try:
 except Exception as e:
     print(f"Erro ao conectar ao Supabase: {e}")
     supabase = None
+
+# Google Apps Script URL for email notifications
+APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyO7efjJ_WX9En8MqfFfNeTxpThEs2gFSfUgSshAoNeZqseIvOBOf2KxtbmK1MXIJ5aCA/exec"
 
 def load_car_records():
     if not os.path.exists(CAR_RECORDS_FILE):
@@ -114,6 +118,17 @@ def submit_initial():
     records = load_car_records()
     records.append(record)
     save_car_records(records)
+
+    # Send email notification for initial save
+    try:
+        payload = {
+            "type": "initial",
+            "data": record
+        }
+        requests.post(APPS_SCRIPT_URL, json=payload, timeout=10)
+    except Exception as e:
+        print(f"Erro ao enviar email para save inicial: {e}")
+
     return jsonify({"status": "ok"})
 
 @app.route('/submit_final', methods=['POST'])
@@ -154,6 +169,15 @@ def submit_final():
                 'final_tank_photo': photos.get('final_tank_photo'),
                 'status': 'complete'
             })
+            # Send email notification for final save
+            try:
+                payload = {
+                    "type": "final",
+                    "data": record
+                }
+                requests.post(APPS_SCRIPT_URL, json=payload, timeout=10)
+            except Exception as e:
+                print(f"Erro ao enviar email para save final: {e}")
             break
     save_car_records(records)
     return jsonify({"status": "ok"})

@@ -1,6 +1,6 @@
-- [x] Adicionar campo de input para "Km Inicial" no templates/initial_form.html antes da seção de foto do km inicial
-- [x] Remover campo readonly de km inicial no templates/final_form.html e adicionar campo editável para km final
-- [x] Remover campos desnecessários do templates/final_form.html: Nome do Solicitante, Data, Endereço de Origem
-- [x] Tornar Hora de Chegada automática no templates/final_form.html
-- [x] Mover campo Km Final acima da foto no templates/final_form.html
-- [x] Remover opção de escolher foto, manter apenas tirar foto no templates/final_form.html
+- [x] Atualizar requirements.txt para adicionar 'requests'
+- [x] Modificar app.py para importar requests e adicionar chamadas POST ao Apps Script após saves
+- [x] Fornecer código Google Apps Script para envio de emails
+- [x] Instruir sobre criação e deploy do Apps Script
+- [x] Adicionar URL do Apps Script no app.py
+- [ ] Testar emails
