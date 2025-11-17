@@ -22,7 +22,7 @@ except Exception as e:
     supabase = None
 
 # Google Apps Script URL for email notifications
-APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyO7efjJ_WX9En8MqfFfNeTxpThEs2gFSfUgSshAoNeZqseIvOBOf2KxtbmK1MXIJ5aCA/exec"
+APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzOA_BkwPcKwTJQooGWISHUnPu6st1gSpf-Ov7RBA2_CrPxb2PRyhA_jckdZTmeYzd9Kw/exec"
 
 def load_car_records():
     if not os.path.exists(CAR_RECORDS_FILE):
