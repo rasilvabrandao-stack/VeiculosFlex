@@ -132,7 +132,7 @@ def submit_initial():
             email_record = record.copy()
             for key in ['initial_km_photo', 'initial_tank_photo', 'car_status_photo']:
                 if email_record.get(key):
-                    email_record[key] = f"{BASE_URL}{email_record[key]}"
+                    email_record[key] = f"{BASE_URL}/{email_record[key]}"
 
             payload = {
                 "type": "initial",
@@ -196,7 +196,7 @@ def submit_final():
                     email_record = record.copy()
                     for key in ['initial_km_photo', 'initial_tank_photo', 'car_status_photo', 'final_km_photo', 'final_tank_photo']:
                         if email_record.get(key):
-                            email_record[key] = f"{BASE_URL}{email_record[key]}"
+                            email_record[key] = f"{BASE_URL}/{email_record[key]}"
 
                     payload = {
                         "type": "final",
