@@ -171,7 +171,82 @@ input[type="time"]:focus {
   box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
 }
 
-    
+    #Autorizador
+  {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 0.95rem;
+      }
+  #textodaora
+  {
+    text-align: center;
+      font-size: 2rem;
+  }
+
+  /* Custom Checkbox Styles for Radio Buttons */
+  .radio-group {
+    margin-top: 10px;
+  }
+
+  .radio-label {
+    display: block;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    user-select: none;
+  }
+
+  .radio-label input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+  }
+
+  .checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 25px;
+    width: 25px;
+    background-color: #eee;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+  }
+
+  .radio-label:hover input ~ .checkmark {
+    background-color: #ccc;
+  }
+
+  .radio-label input:checked ~ .checkmark {
+    background-color: #4CAF50;
+  }
+
+  .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+
+  .radio-label input:checked ~ .checkmark:after {
+    display: block;
+  }
+
+  .radio-label .checkmark:after {
+    left: 9px;
+    top: 5px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg);
+  }
   </style>
 </head>
 <body>
@@ -181,13 +256,26 @@ input[type="time"]:focus {
       <input type="hidden" id="cpf" name="cpf" value="{{ cpf }}">
 
       <label for="requester_name">Nome do Autorizador:</label>
-      <input type="text" id="requester_name" name="requester_name" required>
+      <select id="Autorizador" name="Autorizador">
+        <Option> Selecione </Option>
+        <Option> Iseli </Option>
+        <Option> Elis </Option>
+        <Option> Will </Option>
+        <Option> William </Option>
+        <Option> Ronaldo </Option>
+        <Option> Gustavo </Option>
+        <Option> Jesus </Option>
+        <Option> Bruno </Option>
+        <Option> Ivan </Option>
+        <Option> Thiago Coelho </Option>
+      </select>
+
 
       <label for="reason">Motivo:</label>
       <input type="text" id="reason" name="reason" required>
 
       <label for="driver_name">Nome do Motorista:</label>
-      <input type="text" id="driver_name" name="driver_name" value="{{ driver_name }}" required>
+      <input type="text" id="driver_name" name="driver_name" required>
 
       <label for="date_time">Data e Horário de Saída:</label>
       <input type="text" id="date_time" name="date_time" readonly>
@@ -195,8 +283,17 @@ input[type="time"]:focus {
       <label for="initial_km">Km Inicial:</label>
       <input type="number" id="initial_km" name="initial_km" required>
 
-      <label for="initial_tank_level">Nível Inicial do Tanque (%):</label>
+      <label for="initial_tank_level">Autonomia do tanque de gasolina:</label>
       <input type="number" id="initial_tank_level" name="initial_tank_level" min="0" max="100" required>
+
+            <div class="photo-section">
+        <label>Foto do Painel/Hodômetro:</label>
+        <div class="photo-buttons">
+          <button type="button" onclick="takePhoto('initial_tank')">Tirar Foto</button>
+          <input type="file" id="initial_tank_file" name="initial_tank_photo" accept="image/*" style="display: none;">
+        </div>
+        <img id="initial_tank_preview" class="photo-preview" alt="Preview">
+      </div>
 
      <label for="origin">Endereço de Origem:</label>
       <input type="text" id="origin" name="origin" required>
@@ -208,24 +305,6 @@ input[type="time"]:focus {
       <input type="text" id="destination" name="destination" required>
 
       <div class="photo-section">
-        <label>Foto do Km Inicial:</label>
-        <div class="photo-buttons">
-          <button type="button" onclick="takePhoto('initial_km')">Tirar Foto</button>
-          <input type="file" id="initial_km_file" name="initial_km_photo" accept="image/*" style="display: none;">
-        </div>
-        <img id="initial_km_preview" class="photo-preview" alt="Preview">
-      </div>
-
-      <div class="photo-section">
-        <label>Foto do Nível Inicial do Tanque:</label>
-        <div class="photo-buttons">
-          <button type="button" onclick="takePhoto('initial_tank')">Tirar Foto</button>
-          <input type="file" id="initial_tank_file" name="initial_tank_photo" accept="image/*" style="display: none;">
-        </div>
-        <img id="initial_tank_preview" class="photo-preview" alt="Preview">
-      </div>
-
-      <div class="photo-section">
         <label>Foto do Estado do Carro:</label>
         <div class="photo-buttons">
           <button type="button" onclick="takePhoto('car_status')">Tirar Foto</button>
@@ -233,7 +312,45 @@ input[type="time"]:focus {
         </div>
         <img id="car_status_preview" class="photo-preview" alt="Preview">
       </div>
-      
+      <div class="radio-group">
+    <p id="textodaora"><strong>Estado do veículo</strong></p>
+
+    <div style="margin-bottom: 15px;">
+      <strong>O Veículo está sujo?</strong><br>
+      <label class="radio-label">Sim
+        <input type="radio" name="vehicle_dirty" value="Sim">
+        <span class="checkmark"></span>
+      </label>
+      <label class="radio-label">Não
+        <input type="radio" name="vehicle_dirty" value="Não">
+        <span class="checkmark"></span>
+      </label>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+      <strong>Quebrou alguma peça?</strong><br>
+      <label class="radio-label">Sim
+        <input type="radio" name="vehicle_broken" value="Sim">
+        <span class="checkmark"></span>
+      </label>
+      <label class="radio-label">Não
+        <input type="radio" name="vehicle_broken" value="Não">
+        <span class="checkmark"></span>
+      </label>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+      <strong>Houve danificações?</strong><br>
+      <label class="radio-label">Sim
+        <input type="radio" name="vehicle_damaged" value="Sim">
+        <span class="checkmark"></span>
+      </label>
+      <label class="radio-label">Não
+        <input type="radio" name="vehicle_damaged" value="Não">
+        <span class="checkmark"></span>
+      </label>
+    </div>
+      </div>
       <label for="observations">Observações:</label>
       <textarea id="observations" name="observations" rows="4"></textarea>
 
@@ -242,9 +359,6 @@ input[type="time"]:focus {
         <button type="button" onclick="window.location.href='/'" style="background-color: #f44336;">Sair</button>
       </div>
     </form>
-
-    <p class="alerta">⚠ Mande foto do carro no momento de saída e chegada no número abaixo ⚠</p>
-    <p class="meu-paragrafo">(11) 97404-7741</p>
   </div>
 
   <script>
