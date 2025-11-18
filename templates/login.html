@@ -167,13 +167,55 @@
   IMask(cpfInput, maskOptions);
 </script>
 
+<script>
+function validateCPF(cpf) {
+    // Remove non-digit characters
+    cpf = cpf.replace(/\D/g, '');
+
+    // Check if exactly 11 digits
+    if (cpf.length !== 11) {
+        return false;
+    }
+
+    // Check for repeated digits (invalid CPFs like 11111111111)
+    if (/^(\d)\1+$/.test(cpf)) {
+        return false;
+    }
+
+    // Calculate DV1
+    let sum = 0;
+    for (let i = 0; i < 9; i++) {
+        sum += parseInt(cpf.charAt(i)) * (10 - i);
+    }
+    let rest = sum % 11;
+    let dv1 = (rest < 2) ? 0 : 11 - rest;
+
+    // Calculate DV2
+    sum = 0;
+    for (let i = 0; i < 10; i++) {
+        sum += parseInt(cpf.charAt(i)) * (11 - i);
+    }
+    rest = sum % 11;
+    let dv2 = (rest < 2) ? 0 : 11 - rest;
+
+    // Check if matches
+    return (parseInt(cpf.charAt(9)) === dv1 && parseInt(cpf.charAt(10)) === dv2);
+}
+</script>
 
     <script>
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const cpfValue = document.getElementById('cpf').value;
+
+            if (!validateCPF(cpfValue)) {
+                alert('CPF inválido. Verifique se o CPF tem 11 dígitos e é válido.');
+                return;
+            }
+
             const formData = new FormData(e.target);
             const data = Object.fromEntries(formData);
-            
+
             try {
                 const response = await fetch('/submit_login', {
                     method: 'POST',
