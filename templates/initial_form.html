@@ -1,284 +1,451 @@
-from flask import Flask, request, render_template, jsonify, send_file
-import json
-import os
-from datetime import datetime
-from io import BytesIO
-import openpyxl
-from openpyxl.styles import Font, Alignment, Border, Side
-from supabase import create_client, Client
-import smtplib
-from email.mime.text import MIMEText
-
-app = Flask(__name__)
-
-CAR_RECORDS_FILE = "car_records.json"
-
-# Supabase configuration
-SUPABASE_URL = "https://agumdqjlbpbbohbxzoes.supabase.co"
-SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFndW1kcWpsYnBiYm9oYnh6b2VzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzNTU5NTEsImV4cCI6MjA3NzkzMTk1MX0.DX_W3XL4zj9gs-XC0O3aUptYdhjF9sda2qkj_E-aKx0"
-try:
-    supabase: Client = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
-except Exception as e:
-    print(f"Erro ao conectar ao Supabase: {e}")
-    supabase = None
-
-def load_car_records():
-    if not os.path.exists(CAR_RECORDS_FILE):
-        return []
-    with open(CAR_RECORDS_FILE, 'r', encoding='utf-8') as f:
-        return json.load(f)
-
-def save_car_records(records):
-    with open(CAR_RECORDS_FILE, 'w', encoding='utf-8') as f:
-        json.dump(records, f, ensure_ascii=False, indent=2)
-
-def send_email_notification(record):
-    try:
-        msg = MIMEText(f"Novo registro de saída:\n\nCPF: {record['cpf']}\nNome do Solicitante: {record['requester_name']}\nNome do Motorista: {record['driver_name']}\nHorário de Saída: {record['departure_time']}\nKm Inicial: {record['initial_km']}\nOrigem: {record['origin']}\nDestino: {record['destination']}\nNível do Tanque: {record['initial_tank_level']}\nEstado do Carro: {record['car_status']}")
-        msg['Subject'] = 'Novo Registro de Saída de Carro'
-        msg['From'] = 'your_email@example.com'  # Replace with your email
-        msg['To'] = 'admin@example.com'  # Replace with recipient email
-
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.starttls()
-        server.login('your_email@example.com', 'your_password')  # Replace with your credentials
-        server.sendmail('your_email@example.com', 'admin@example.com', msg.as_string())
-        server.quit()
-        print("Email sent successfully")
-    except Exception as e:
-        print(f"Failed to send email: {e}")
-
-@app.route('/')
-def index():
-    return render_template('login.html')
-
-@app.route('/login')
-def login():
-    return render_template('login.html')
-
-@app.route('/submit_login', methods=['POST'])
-def submit_login():
-    data = request.get_json()
-    cpf = data.get('cpf')
-    driver_name = data.get('driver_name')
-    records = load_car_records()
-    existing_record = next((r for r in records if r.get('cpf') == cpf and r.get('status') == 'initial'), None)
-    if existing_record:
-        return jsonify({"redirect": f"/form/{cpf}"})
-    else:
-        return jsonify({"redirect": f"/form/{cpf}?name={driver_name}"})
-
-@app.route('/form/<cpf>')
-def form(cpf):
-    driver_name = request.args.get('name')
-    current_time = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
-    records = load_car_records()
-    existing_record = next((r for r in records if r.get('cpf') == cpf and r.get('status') == 'initial'), None)
-    if existing_record:
-        return render_template('final_form.html', record=existing_record, cpf=cpf)
-    else:
-        return render_template('initial_form.html', cpf=cpf, driver_name=driver_name, current_time=current_time)
-
-@app.route('/submit_initial', methods=['POST'])
-def submit_initial():
-    data = request.form.to_dict()
-    cpf = data.get('cpf')
-    photos = {}
-    for key in request.files:
-        file = request.files[key]
-        if file and file.filename:
-            filename = f"{cpf}_{key}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg"
-            filepath = os.path.join('static', 'photos', filename)
-            file.save(filepath)
-            photos[key] = filepath
-
-    record = {
-        'cpf': cpf,
-        'requester_name': data.get('requester_name'),
-        'driver_name': data.get('driver_name'),
-        'date': data.get('date'),
-        'initial_km': data.get('initial_km'),
-        'departure_time': data.get('departure_time'),
-        'origin': data.get('origin'),
-        'initial_tank_level': data.get('initial_tank_level'),
-        'destination': data.get('destination'),
-        'car_status': data.get('car_status'),
-        'initial_km_photo': photos.get('initial_km_photo'),
-        'initial_tank_photo': photos.get('initial_tank_photo'),
-        'car_status_photo': photos.get('car_status_photo'),
-        'status': 'initial'
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controle de Carro - Saída</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(100deg, #b001a8 0%, #0277b7 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    # Insert into Supabase
-    if supabase:
-        try:
-            supabase.table('registros').insert({
-                'cpf': record['cpf'],
-                'requester_name': record['requester_name'],
-                'driver_name': record['driver_name'],
-                'date': record['date'],
-                'initial_km': record['initial_km'],
-                'departure_time': record['departure_time'],
-                'origin': record['origin'],
-                'initial_tank_level': record['initial_tank_level'],
-                'destination': record['destination'],
-                'car_status': record['car_status'],
-                'initial_km_photo': record['initial_km_photo'],
-                'initial_tank_photo': record['initial_tank_photo'],
-                'car_status_photo': record['car_status_photo'],
-                'status': 'initial'
-            }).execute()
-        except Exception as e:
-            return jsonify({"status": "error", "message": f"Erro ao salvar no Supabase: {str(e)}"})
 
-    records = load_car_records()
-    records.append(record)
-    save_car_records(records)
+    .container {
+      width: 90%;
+      max-width: 550px;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+      margin: 20px auto;
+    }
 
-    # Send email notification
-    send_email_notification(record)
+    h1 {
+      text-align: center;
+      color: #333;
+      font-size: 1.6rem;
+      margin-bottom: 15px;
+    }
 
-    return jsonify({"status": "ok"})
+    form {
+      display: flex;
+      flex-direction: column;
+    }
 
-@app.route('/submit_final', methods=['POST'])
-def submit_final():
-    data = request.form.to_dict()
-    cpf = data.get('cpf')
-    photos = {}
-    for key in request.files:
-        file = request.files[key]
-        if file and file.filename:
-            filename = f"{cpf}_{key}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg"
-            filepath = os.path.join('static', 'photos', filename)
-            file.save(filepath)
-            photos[key] = filepath
+    .photo-section {
+      display: flex;
+      flex-direction: column;
+      margin-top: 10px;
+    }
 
-    # Update in Supabase
-    if supabase:
-        try:
-            supabase.table('registros').update({
-                'final_km': data.get('final_km'),
-                'arrival_time': data.get('arrival_time'),
-                'final_tank_level': data.get('final_tank_level'),
-                'final_km_photo': photos.get('final_km_photo'),
-                'final_tank_photo': photos.get('final_tank_photo'),
-                'status': 'complete'
-            }).eq('cpf', cpf).eq('status', 'initial').execute()
-        except Exception as e:
-            return jsonify({"status": "error", "message": f"Erro ao atualizar no Supabase: {str(e)}"})
+    .photo-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 5px;
+      flex-wrap: wrap;
+    }
 
-    records = load_car_records()
-    for record in records:
-        if record.get('cpf') == cpf and record.get('status') == 'initial':
-            record.update({
-                'final_km': data.get('final_km'),
-                'arrival_time': data.get('arrival_time'),
-                'final_tank_level': data.get('final_tank_level'),
-                'final_km_photo': photos.get('final_km_photo'),
-                'final_tank_photo': photos.get('final_tank_photo'),
-                'status': 'complete'
-            })
-            break
-    save_car_records(records)
-    return jsonify({"status": "ok"})
+    .photo-buttons button {
+      padding: 8px 12px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
 
-@app.route('/view_records')
-def view_records():
-    records = load_car_records()
-    complete_records = [r for r in records if r.get('status') == 'complete']
-    return render_template('registro.html', records=complete_records)
+    .photo-buttons button:hover {
+      background-color: #0056b3;
+    }
 
-@app.route('/admin_login')
-def admin_login():
-    return render_template('admin_login.html')
+    .photo-preview {
+      margin-top: 10px;
+      max-width: 200px;
+      max-height: 150px;
+      border: 1px solid #ccc;
+      display: none;
+    }
 
-@app.route('/submit_admin_login', methods=['POST'])
-def submit_admin_login():
-    data = request.get_json()
-    username = data.get('username')
-    password = data.get('password')
-    # Simple authentication - in production, use proper hashing and database
-    if username == 'admin' and password == 'admin123':
-        return jsonify({"redirect": "/admin_dashboard"})
-    else:
-        return jsonify({"error": "Credenciais inválidas"}), 401
+    label {
+      margin-top: 12px;
+      font-weight: bold;
+      font-size: 0.95rem;
+    }
 
-@app.route('/admin_dashboard')
-def admin_dashboard():
-    if supabase:
-        try:
-            # Fetch all records from Supabase
-            response = supabase.table('registros').select('*').execute()
-            all_records = response.data
-        except Exception as e:
-            # Fallback to local JSON if Supabase fails
-            records = load_car_records()
-            all_records = [r for r in records if r.get('status') in ['initial', 'complete']]
-    else:
-        # Fallback to local JSON if Supabase is not available
-        records = load_car_records()
-        all_records = [r for r in records if r.get('status') in ['initial', 'complete']]
-    return render_template('admin_dashboard.html', records=all_records)
+    input {
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 0.95rem;
+    }
 
-@app.route('/download_excel')
-def download_excel():
-    if supabase:
-        try:
-            # Fetch data from Supabase
-            response = supabase.table('registros').select('*').execute()
-            registros = response.data
-            complete_records = [r for r in registros if r.get('status') == 'complete']
-        except Exception as e:
-            return jsonify({"status": "error", "message": f"Erro ao buscar dados do Supabase: {str(e)}"})
-    else:
-        # Fallback to local JSON if Supabase is not available
-        records = load_car_records()
-        complete_records = [r for r in records if r.get('status') == 'complete']
+    textarea {
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      resize: vertical;
+    }
 
-    # Create Excel workbook
-    wb = openpyxl.Workbook()
-    ws = wb.active
-    ws.title = "Registros de Carro"
+    button {
+      margin-top: 25px;
+      padding: 12px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s;
+    }
 
-    # Define styles
-    header_font = Font(bold=True)
-    header_alignment = Alignment(horizontal='center')
-    thin_border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
+    button:hover {
+      background-color: #45a049;
+    }
 
-    # Headers
-    headers = ['CPF', 'Nome do Solicitante', 'Nome do Motorista', 'Data', 'Km Inicial', 'Horário de Saída', 'Origem', 'Nível Inicial do Tanque', 'Destino', 'Km Final', 'Hora de Chegada', 'Nível Final do Tanque']
-    for col_num, header in enumerate(headers, 1):
-        cell = ws.cell(row=1, column=col_num, value=header)
-        cell.font = header_font
-        cell.alignment = header_alignment
-        cell.border = thin_border
+    .alerta {
+      font-weight: bold;
+      margin-top: 25px;
+      color: red;
+      font-size: 0.95rem;
+      text-align: center;
+    }
 
-    # Data
-    for row_num, record in enumerate(complete_records, 2):
-        ws.cell(row=row_num, column=1, value=record.get('cpf')).border = thin_border
-        ws.cell(row=row_num, column=2, value=record.get('requester_name')).border = thin_border
-        ws.cell(row=row_num, column=3, value=record.get('driver_name')).border = thin_border
-        ws.cell(row=row_num, column=4, value=record.get('date')).border = thin_border
-        ws.cell(row=row_num, column=5, value=record.get('initial_km')).border = thin_border
-        ws.cell(row=row_num, column=6, value=record.get('departure_time')).border = thin_border
-        ws.cell(row=row_num, column=7, value=record.get('origin')).border = thin_border
-        ws.cell(row=row_num, column=8, value=record.get('initial_tank_level')).border = thin_border
-        ws.cell(row=row_num, column=9, value=record.get('destination')).border = thin_border
-        ws.cell(row=row_num, column=10, value=record.get('final_km')).border = thin_border
-        ws.cell(row=row_num, column=11, value=record.get('arrival_time')).border = thin_border
-        ws.cell(row=row_num, column=12, value=record.get('final_tank_level')).border = thin_border
+    .meu-paragrafo {
+      color: #000;
+      font-weight: bold;
+      text-align: center;
+      font-size: 1rem;
+      margin-top: 5px;
+    }
 
-    # Adjust column widths
-    column_widths = [15, 20, 20, 12, 12, 15, 15, 20, 15, 12, 15, 20]
-    for col_num, width in enumerate(column_widths, 1):
-        ws.column_dimensions[openpyxl.utils.get_column_letter(col_num)].width = width
+    /* Responsividade */
+    @media (max-width: 600px) {
+      .container {
+        padding: 15px;
+        border-radius: 10px;
+      }
 
-    # Save to BytesIO
-    output = BytesIO()
-    wb.save(output)
-    output.seek(0)
+      h1 {
+        font-size: 1.4rem;
+      }
 
-    return send_file(output, download_name='registros_carro.xlsx', as_attachment=True)
+      label {
+        font-size: 0.9rem;
+      }
 
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=False)
+      input {
+        font-size: 0.9rem;
+        padding: 9px;
+      }
+
+      button {
+        font-size: 0.95rem;
+        padding: 10px;
+      }
+    }
+/* Remove o estilo nativo dos inputs de data e hora */
+input[type="date"],
+input[type="time"] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: white;
+  color: #000;
+}
+
+/* Mantém o estilo igual aos outros inputs */
+input[type="date"]:focus,
+input[type="time"]:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+}
+
+    #Autorizador
+  {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 0.95rem;
+      }
+  #textodaora
+  {
+    text-align: center;
+      font-size: 2rem;
+  }
+
+  /* Custom Checkbox Styles for Radio Buttons */
+  .radio-group {
+    margin-top: 10px;
+  }
+
+  .radio-label {
+    display: block;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    user-select: none;
+  }
+
+  .radio-label input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+  }
+
+  .checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 25px;
+    width: 25px;
+    background-color: #eee;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+  }
+
+  .radio-label:hover input ~ .checkmark {
+    background-color: #ccc;
+  }
+
+  .radio-label input:checked ~ .checkmark {
+    background-color: #4CAF50;
+  }
+
+  .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+
+  .radio-label input:checked ~ .checkmark:after {
+    display: block;
+  }
+
+  .radio-label .checkmark:after {
+    left: 9px;
+    top: 5px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg);
+  }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Controle de Carro - Saída</h1>
+    <form id="initialForm" enctype="multipart/form-data">
+      <input type="hidden" id="cpf" name="cpf" value="{{ cpf }}">
+
+      <label for="requester_name">Nome do Autorizador:</label>
+      <select id="Autorizador" name="requester_name">
+        <Option> Selecione </Option>
+        <Option> Iseli </Option>
+        <Option> Elis </Option>
+        <Option> Will </Option>
+        <Option> William </Option>
+        <Option> Ronaldo </Option>
+        <Option> Gustavo </Option>
+        <Option> Jesus </Option>
+        <Option> Bruno </Option>
+        <Option> Ivan </Option>
+        <Option> Thiago Coelho </Option>
+      </select>
+
+
+      <label for="reason">Motivo:</label>
+      <input type="text" id="reason" name="reason" required>
+
+      <label for="driver_name">Nome do Motorista:</label>
+      <input type="text" id="driver_name" name="driver_name" value="{{ driver_name }}" required>
+
+      <label for="departure_time">Data e Horário de Saída:</label>
+      <input type="text" id="departure_time" name="departure_time" value="{{ current_time }}" readonly>
+
+      <label for="initial_km">Km Inicial:</label>
+      <input type="number" id="initial_km" name="initial_km" required>
+
+      <label for="initial_tank_level">Autonomia do tanque de gasolina:</label>
+      <input type="number" id="initial_tank_level" name="initial_tank_level" min="0" max="100" required>
+
+            <div class="photo-section">
+        <label>Foto do Painel/Hodômetro:</label>
+        <div class="photo-buttons">
+          <button type="button" onclick="takePhoto('initial_tank')">Tirar Foto</button>
+          <input type="file" id="initial_tank_file" name="initial_tank_photo" accept="image/*" style="display: none;">
+        </div>
+        <img id="initial_tank_preview" class="photo-preview" alt="Preview">
+      </div>
+
+     <label for="origin">Endereço de Origem:</label>
+      <input type="text" id="origin" name="origin" required>
+
+     <label for="car_status">Estado do Carro:</label>
+      <input type="text" id="car_status" name="car_status" required>
+
+      <label for="destination">Endereço de Destino:</label>
+      <input type="text" id="destination" name="destination" required>
+
+      <div class="photo-section">
+        <label>Foto do Estado do Carro:</label>
+        <div class="photo-buttons">
+          <button type="button" onclick="takePhoto('car_status')">Tirar Foto</button>
+          <input type="file" id="car_status_file" name="car_status_photo" accept="image/*" style="display: none;">
+        </div>
+        <img id="car_status_preview" class="photo-preview" alt="Preview">
+      </div>
+      <div class="radio-group">
+    <p id="textodaora"><strong>Estado do veículo</strong></p>
+
+    <div style="margin-bottom: 15px;">
+      <strong>O Veículo está sujo?</strong><br>
+      <label class="radio-label">Sim
+        <input type="radio" name="vehicle_dirty" value="Sim">
+        <span class="checkmark"></span>
+      </label>
+      <label class="radio-label">Não
+        <input type="radio" name="vehicle_dirty" value="Não">
+        <span class="checkmark"></span>
+      </label>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+      <strong>Quebrou alguma peça?</strong><br>
+      <label class="radio-label">Sim
+        <input type="radio" name="vehicle_broken" value="Sim">
+        <span class="checkmark"></span>
+      </label>
+      <label class="radio-label">Não
+        <input type="radio" name="vehicle_broken" value="Não">
+        <span class="checkmark"></span>
+      </label>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+      <strong>Houve danificações?</strong><br>
+      <label class="radio-label">Sim
+        <input type="radio" name="vehicle_damaged" value="Sim">
+        <span class="checkmark"></span>
+      </label>
+      <label class="radio-label">Não
+        <input type="radio" name="vehicle_damaged" value="Não">
+        <span class="checkmark"></span>
+      </label>
+    </div>
+      </div>
+      <label for="observations">Observações:</label>
+      <textarea id="observations" name="observations" rows="4"></textarea>
+
+      <div style="display: flex; gap: 10px; margin-top: 25px;">
+        <button type="submit">Salvar Saída</button>
+        <button type="button" onclick="window.location.href='/'" style="background-color: #f44336;">Sair</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    function takePhoto(field, facingMode = 'environment') {
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: facingMode } })
+        .then(function(stream) {
+          const video = document.createElement('video');
+          video.srcObject = stream;
+          video.play();
+          const canvas = document.createElement('canvas');
+          canvas.width = 640;
+          canvas.height = 480;
+          const context = canvas.getContext('2d');
+          video.addEventListener('loadedmetadata', function() {
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            canvas.toBlob(function(blob) {
+              const file = new File([blob], `${field}_photo.jpg`, { type: 'image/jpeg' });
+              const dataTransfer = new DataTransfer();
+              dataTransfer.items.add(file);
+              document.getElementById(`${field}_file`).files = dataTransfer.files;
+              document.getElementById(`${field}_preview`).src = URL.createObjectURL(blob);
+              document.getElementById(`${field}_preview`).style.display = 'block';
+              stream.getTracks().forEach(track => track.stop());
+            }, 'image/jpeg');
+          });
+        })
+        .catch(function(err) {
+          alert('Erro ao acessar câmera: ' + err.message);
+        });
+    }
+
+    document.getElementById('initial_km_file').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        document.getElementById('initial_km_preview').src = URL.createObjectURL(file);
+        document.getElementById('initial_km_preview').style.display = 'block';
+      }
+    });
+
+    document.getElementById('initial_tank_file').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        document.getElementById('initial_tank_preview').src = URL.createObjectURL(file);
+        document.getElementById('initial_tank_preview').style.display = 'block';
+      }
+    });
+
+    document.getElementById('car_status_file').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        document.getElementById('car_status_preview').src = URL.createObjectURL(file);
+        document.getElementById('car_status_preview').style.display = 'block';
+      }
+    });
+
+    // Set current date and time on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      const now = new Date();
+      const dateTimeString = now.toLocaleString('pt-BR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+      document.getElementById('departure_time').value = dateTimeString;
+    });
+
+    document.getElementById('initialForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      fetch('/submit_initial', {
+        method: 'POST',
+        body: formData,
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'ok') {
+          alert('Salvo com sucesso!');
+          // Redirect to login instead of resetting form
+          window.location.href = '/';
+        } else {
+          alert('Erro ao salvar saída.');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
