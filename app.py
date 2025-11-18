@@ -109,13 +109,17 @@ def submit_initial():
             'cpf': cpf,
             'requester_name': data.get('requester_name'),
             'driver_name': data.get('driver_name'),
-            'date': data.get('date_time'),  # Changed from 'date' to 'date_time' to match form
+            'date': data.get('date_time'),  # Will be parsed below
             'initial_km': data.get('initial_km'),
-            'departure_time': data.get('departure_time'),
+            'departure_time': data.get('departure_time'),  # Will be parsed below
             'origin': data.get('origin'),
             'initial_tank_level': data.get('initial_tank_level'),
             'destination': data.get('destination'),
             'car_status': data.get('car_status'),
+            'reason': data.get('reason'),
+            'vehicle_dirty': data.get('vehicle_dirty'),
+            'vehicle_broken': data.get('vehicle_broken'),
+            'vehicle_damaged': data.get('vehicle_damaged'),
             'observations': data.get('observations'),
             'initial_km_photo': photos.get('initial_km_photo'),
             'initial_tank_photo': photos.get('initial_tank_photo'),
@@ -197,13 +201,29 @@ def submit_final():
                         print(f"Erro ao fazer upload para Supabase Storage: {str(e)}")
                         continue
 
+        # Parse arrival_time to TIME
+        arrival_time_str = data.get('arrival_time')
+        if arrival_time_str:
+            try:
+                # Assuming format: dd/mm/yyyy hh:mm:ss
+                dt = datetime.strptime(arrival_time_str, '%d/%m/%Y %H:%M:%S')
+                arrival_time = dt.time().isoformat()  # HH:MM:SS
+            except ValueError:
+                # Fallback if parsing fails
+                arrival_time = arrival_time_str
+        else:
+            arrival_time = None
+
         # Update in Supabase
         if supabase:
             try:
                 supabase.table('registros').update({
                     'final_km': int(data.get('final_km')) if data.get('final_km') else None,
-                    'arrival_time': data.get('arrival_time'),
+                    'arrival_time': arrival_time,
                     'final_tank_level': data.get('final_tank_level'),
+                    'observations': data.get('observations'),
+                    'final_km_photo': photos.get('final_km_photo'),
+                    'final_tank_photo': photos.get('final_tank_photo'),
                     'status': 'complete'
                 }).eq('cpf', cpf).eq('status', 'initial').execute()
             except Exception as e:
@@ -215,7 +235,7 @@ def submit_final():
             if record.get('cpf') == cpf and record.get('status') == 'initial':
                 record.update({
                     'final_km': data.get('final_km'),
-                    'arrival_time': data.get('arrival_time'),
+                    'arrival_time': arrival_time,
                     'final_tank_level': data.get('final_tank_level'),
                     'observations': data.get('observations'),
                     'final_km_photo': photos.get('final_km_photo'),
