@@ -201,12 +201,9 @@ def submit_final():
         if supabase:
             try:
                 supabase.table('registros').update({
-                    'final_km': data.get('final_km'),
+                    'final_km': int(data.get('final_km')) if data.get('final_km') else None,
                     'arrival_time': data.get('arrival_time'),
                     'final_tank_level': data.get('final_tank_level'),
-                    'observations': data.get('observations'),
-                    'final_km_photo': photos.get('final_km_photo'),
-                    'final_tank_photo': photos.get('final_tank_photo'),
                     'status': 'complete'
                 }).eq('cpf', cpf).eq('status', 'initial').execute()
             except Exception as e:
