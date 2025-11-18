@@ -3,4 +3,4 @@ openpyxl==3.1.2
 gunicorn==21.2.0
 supabase==1.0.2
 requests==2.31.0
-Pillow==10.3.0 --only-binary=Pillow
+Pillow==11.3.0 --only-binary=Pillow

@@ -8,5 +8,5 @@ apt-get update && apt-get install -y \
 # Upgrade pip
 python -m pip install --upgrade pip
 
-# Install Python dependencies
-pip install -r requirements.txt
+# Install Python dependencies with no cache to avoid old cached source builds
+pip install --no-cache-dir -r requirements.txt
