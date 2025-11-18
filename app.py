@@ -135,11 +135,6 @@ def submit_initial():
                     'origin': record['origin'],
                     'initial_tank_level': record['initial_tank_level'],
                     'destination': record['destination'],
-                    'car_status': record['car_status'],
-                    'observations': record['observations'],
-                    'initial_km_photo': record['initial_km_photo'],
-                    'initial_tank_photo': record['initial_tank_photo'],
-                    'car_status_photo': record['car_status_photo'],
                     'status': 'initial'
                 }).execute()
             except Exception as e:
