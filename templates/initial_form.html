@@ -244,10 +244,10 @@
       <div class="photo-section">
         <label>Foto do Painel/Hodômetro:</label>
         <div class="photo-buttons">
-          <button type="button" onclick="takePhoto('initial_panel')">Tirar Foto</button>
-          <input type="file" id="initial_panel_file" name="initial_panel_photo" accept="image/*" style="display: none;">
+          <button type="button" onclick="takePhoto('initial_tank')">Tirar Foto</button>
+          <input type="file" id="initial_tank_file" name="initial_tank_photo" accept="image/*" style="display: none;">
         </div>
-        <img id="initial_panel_preview" class="photo-preview" alt="Preview">
+        <img id="initial_tank_preview" class="photo-preview" alt="Preview">
       </div>
 
       <label for="origin">Endereço de Origem:</label>
@@ -262,10 +262,10 @@
       <div class="photo-section">
         <label>Foto do Estado do Carro:</label>
         <div class="photo-buttons">
-          <button type="button" onclick="takePhoto('initial_car')">Tirar Foto</button>
-          <input type="file" id="initial_car_file" name="initial_car_photo" accept="image/*" style="display: none;">
+          <button type="button" onclick="takePhoto('car_status')">Tirar Foto</button>
+          <input type="file" id="car_status_file" name="car_status_photo" accept="image/*" style="display: none;">
         </div>
-        <img id="initial_car_preview" class="photo-preview" alt="Preview">
+        <img id="car_status_preview" class="photo-preview" alt="Preview">
       </div>
       <label for="observations">Observações:</label>
       <textarea id="observations" name="observations" rows="4"></textarea>
@@ -348,12 +348,12 @@
       }
 
       // 2 — Validar fotos obrigatórias
-      if (document.getElementById('initial_panel_file').files.length === 0) {
+      if (document.getElementById('initial_tank_file').files.length === 0) {
         alert("Por favor, tire a foto do Painel/Hodômetro.");
         return;
       }
 
-      if (document.getElementById('initial_car_file').files.length === 0) {
+      if (document.getElementById('car_status_file').files.length === 0) {
         alert("Por favor, tire a foto do Estado do Carro.");
         return;
       }
