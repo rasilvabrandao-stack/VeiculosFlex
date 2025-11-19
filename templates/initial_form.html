@@ -208,7 +208,7 @@
 <body>
   <div class="container">
     <h1>Controle de Carro - Saída</h1>
-    <form id="initialForm" enctype="multipart/form-data">
+    <form id="initialForm" enctype="multipart/form-data" method="post">
       <input type="hidden" id="cpf" name="cpf" value="{{ cpf }}">
 
       <label for="requester_name">Nome do Autorizador:</label>
@@ -278,103 +278,80 @@
   </div>
 
   <script>
-    function takePhoto(field, facingMode = 'environment') {
-      navigator.mediaDevices.getUserMedia({ video: { facingMode: facingMode } })
-        .then(function(stream) {
-          const video = document.createElement('video');
-          video.srcObject = stream;
-          video.play();
-          const canvas = document.createElement('canvas');
-          canvas.width = 640;
-          canvas.height = 480;
-          const context = canvas.getContext('2d');
-          video.addEventListener('loadedmetadata', function() {
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-            canvas.toBlob(function(blob) {
-              const file = new File([blob], `${field}_photo.jpg`, { type: 'image/jpeg' });
-              const dataTransfer = new DataTransfer();
-              dataTransfer.items.add(file);
-              document.getElementById(`${field}_file`).files = dataTransfer.files;
-              document.getElementById(`${field}_preview`).src = URL.createObjectURL(blob);
-              document.getElementById(`${field}_preview`).style.display = 'block';
-              stream.getTracks().forEach(track => track.stop());
-            }, 'image/jpeg');
-          });
-        })
-        .catch(function(err) {
-          alert('Erro ao acessar câmera: ' + err.message);
-        });
-    }
+function takePhoto(field, facingMode = 'environment') {
+  navigator.mediaDevices.getUserMedia({ video: { facingMode } })
+    .then(stream => {
+      const video = document.createElement('video');
+      video.srcObject = stream;
+      video.play();
 
-    document.getElementById('initial_tank_file').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        document.getElementById('initial_tank_preview').src = URL.createObjectURL(file);
-        document.getElementById('initial_tank_preview').style.display = 'block';
-      }
-    });
+      const canvas = document.createElement('canvas');
+      canvas.width = 640;
+      canvas.height = 480;
+      const ctx = canvas.getContext('2d');
 
-    document.getElementById('car_status_file').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        document.getElementById('car_status_preview').src = URL.createObjectURL(file);
-        document.getElementById('car_status_preview').style.display = 'block';
-      }
-    });
+      video.addEventListener('loadedmetadata', () => {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    // Set current date/time on page load
-    document.addEventListener('DOMContentLoaded', function() {
-      const now = new Date();
-      const dateTimeString = now.toLocaleString('pt-BR', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
+        canvas.toBlob(blob => {
+          const file = new File([blob], `${field}_photo.jpg`, { type: 'image/jpeg' });
+
+          const dt = new DataTransfer();
+          dt.items.add(file);
+
+          // Corrigido: IDs corretos
+          document.getElementById(`${field}_file`).files = dt.files;
+          document.getElementById(`${field}_preview`).src = URL.createObjectURL(blob);
+          document.getElementById(`${field}_preview`).style.display = 'block';
+
+          stream.getTracks().forEach(track => track.stop());
+        }, 'image/jpeg');
       });
-      document.getElementById('departure_time').value = dateTimeString;
-    });
+    })
+    .catch(err => alert('Erro ao acessar câmera: ' + err.message));
+}
 
-    /* -------------- NOVA VALIDAÇÃO COMPLETA ---------------- */
-    document.getElementById('initialForm').addEventListener('submit', function(e) {
-      e.preventDefault();
+// Atualiza data/hora automaticamente
+document.addEventListener('DOMContentLoaded', () => {
+  const now = new Date();
+  document.getElementById('departure_time').value = now.toLocaleString('pt-BR');
+});
 
-      // 1 — Validar autorizador
-      const autorizador = document.getElementById('Autorizador').value.trim();
-      if (autorizador === "Selecione") {
-        alert("Por favor, selecione um nome de autorizador.");
-        return;
-      }
+// SUBMIT CORRIGIDO
+document.getElementById('initialForm').addEventListener('submit', async e => {
+  e.preventDefault();
 
-      // 2 — Validar fotos obrigatórias
-      if (document.getElementById('initial_panel_file').files.length === 0) {
-        alert("Por favor, tire a foto do Painel/Hodômetro.");
-        return;
-      }
+  const autorizador = document.getElementById('Autorizador').value;
+  if (autorizador === "Selecione") {
+    alert("Selecione um autorizador.");
+    return;
+  }
 
-      if (document.getElementById('initial_car_file').files.length === 0) {
-        alert("Por favor, tire a foto do Estado do Carro.");
-        return;
-      }
+  if (!document.getElementById('initial_panel_file').files.length) {
+    alert("Tire a foto do painel.");
+    return;
+  }
+  if (!document.getElementById('initial_car_file').files.length) {
+    alert("Tire a foto do carro.");
+    return;
+  }
 
-      // 4 — Enviar formulário
-      const formData = new FormData(e.target);
+  const formData = new FormData(e.target);
 
-      fetch('/submit_initial', {
-        method: 'POST',
-        body: formData,
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.status === 'ok') {
-          alert('Salvo com sucesso!');
-          window.location.href = '/';
-        } else {
-          alert('Erro ao salvar saída.');
-        }
-      });
-    });
-  </script>
+  const response = await fetch('/submit_initial', {
+    method: 'POST',
+    body: formData
+  });
+
+  const data = await response.json();
+
+  if (data.status === 'ok') {
+    alert('Salvo com sucesso!');
+    window.location.href = '/';
+  } else {
+    alert('Erro ao salvar.');
+  }
+});
+</script>
 </body>
 </html>
