@@ -259,6 +259,54 @@ input[type="time"]:focus {
       document.getElementById('arrival_time').value = dateTimeString;
     });
 
+          <div class="radio-group">
+        <p id="textodaora"><strong>Estado do veículo</strong></p>
+
+        <div style="margin-bottom: 15px;">
+          <strong>O Veículo está sujo?</strong><br>
+          <label class="radio-label">Sim
+            <input type="radio" name="vehicle_dirty" value="Sim">
+            <span class="checkmark"></span>
+          </label>
+          <label class="radio-label">Não
+            <input type="radio" name="vehicle_dirty" value="Não">
+            <span class="checkmark"></span>
+          </label>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+          <strong>Quebrou alguma peça?</strong><br>
+          <label class="radio-label">Sim
+            <input type="radio" name="vehicle_broken" value="Sim">
+            <span class="checkmark"></span>
+          
+          <label class="radio-label">Não
+            <input type="radio" name="vehicle_broken" value="Não">
+            <span class="checkmark"></span>
+          </label>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+          <strong>Houve danificações?</strong><br>
+          <label class="radio-label">Sim
+            <input type="radio" name="vehicle_damaged" value="Sim">
+            <span class="checkmark"></span>
+          </label>
+          <label class="radio-label">Não
+            <input type="radio" name="vehicle_damaged" value="Não">
+            <span class="checkmark"></span>
+          </label>
+        </div>
+      </div>
+    const vehicleDirty = document.querySelector('input[name="vehicle_dirty"]:checked');
+      const vehicleBroken = document.querySelector('input[name="vehicle_broken"]:checked');
+      const vehicleDamaged = document.querySelector('input[name="vehicle_damaged"]:checked');
+
+      if (!vehicleDirty || !vehicleBroken || !vehicleDamaged) {
+        alert("Por favor, responda todas as perguntas sobre o estado do veículo.");
+        return;
+      }
+
     document.getElementById('finalForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const formData = new FormData(e.target);
