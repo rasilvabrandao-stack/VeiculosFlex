@@ -128,125 +128,81 @@
       margin-top: 5px;
     }
 
-    /* Responsividade */
-    @media (max-width: 600px) {
-      .container {
-        padding: 15px;
-        border-radius: 10px;
-      }
-
-      h1 {
-        font-size: 1.4rem;
-      }
-
-      label {
-        font-size: 0.9rem;
-      }
-
-      input {
-        font-size: 0.9rem;
-        padding: 9px;
-      }
-
-      button {
-        font-size: 0.95rem;
-        padding: 10px;
-      }
+    #Autorizador {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 0.95rem;
     }
-/* Remove o estilo nativo dos inputs de data e hora */
-input[type="date"],
-input[type="time"] {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-color: white;
-  color: #000;
-}
 
-/* Mantém o estilo igual aos outros inputs */
-input[type="date"]:focus,
-input[type="time"]:focus {
-  outline: none;
-  border-color: #4CAF50;
-  box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
-}
-
-    #Autorizador
-  {
-        width: 100%;
-        padding: 10px;
-        margin-top: 5px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        font-size: 0.95rem;
-      }
-  #textodaora
-  {
-    text-align: center;
+    #textodaora {
+      text-align: center;
       font-size: 2rem;
-  }
+    }
 
-  /* Custom Checkbox Styles for Radio Buttons */
-  .radio-group {
-    margin-top: 10px;
-  }
+    /* Radio buttons custom */
+    .radio-group {
+      margin-top: 10px;
+    }
 
-  .radio-label {
-    display: block;
-    position: relative;
-    padding-left: 35px;
-    margin-bottom: 12px;
-    cursor: pointer;
-    font-size: 0.95rem;
-    user-select: none;
-  }
+    .radio-label {
+      display: block;
+      position: relative;
+      padding-left: 35px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      user-select: none;
+    }
 
-  .radio-label input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-    height: 0;
-    width: 0;
-  }
+    .radio-label input {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+      height: 0;
+      width: 0;
+    }
 
-  .checkmark {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 25px;
-    width: 25px;
-    background-color: #eee;
-    border-radius: 4px;
-    transition: background-color 0.3s;
-  }
+    .checkmark {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 25px;
+      width: 25px;
+      background-color: #eee;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+    }
 
-  .radio-label:hover input ~ .checkmark {
-    background-color: #ccc;
-  }
+    .radio-label:hover input ~ .checkmark {
+      background-color: #ccc;
+    }
 
-  .radio-label input:checked ~ .checkmark {
-    background-color: #4CAF50;
-  }
+    .radio-label input:checked ~ .checkmark {
+      background-color: #4CAF50;
+    }
 
-  .checkmark:after {
-    content: "";
-    position: absolute;
-    display: none;
-  }
+    .checkmark:after {
+      content: "";
+      position: absolute;
+      display: none;
+    }
 
-  .radio-label input:checked ~ .checkmark:after {
-    display: block;
-  }
+    .radio-label input:checked ~ .checkmark:after {
+      display: block;
+    }
 
-  .radio-label .checkmark:after {
-    left: 9px;
-    top: 5px;
-    width: 5px;
-    height: 10px;
-    border: solid white;
-    border-width: 0 3px 3px 0;
-    transform: rotate(45deg);
-  }
+    .radio-label .checkmark:after {
+      left: 9px;
+      top: 5px;
+      width: 5px;
+      height: 10px;
+      border: solid white;
+      border-width: 0 3px 3px 0;
+      transform: rotate(45deg);
+    }
   </style>
 </head>
 <body>
@@ -270,7 +226,6 @@ input[type="time"]:focus {
         <Option> Thiago Coelho </Option>
       </select>
 
-
       <label for="reason">Motivo:</label>
       <input type="text" id="reason" name="reason" required>
 
@@ -278,7 +233,7 @@ input[type="time"]:focus {
       <input type="text" id="driver_name" name="driver_name" value="{{ driver_name }}" required>
 
       <label for="departure_time">Data e Horário de Saída:</label>
-      <input type="text" id="departure_time" name="departure_time" value="{{ current_time }}" readonly>
+      <input type="text" id="departure_time" name="departure_time" readonly>
 
       <label for="initial_km">Km Inicial:</label>
       <input type="number" id="initial_km" name="initial_km" required>
@@ -286,7 +241,7 @@ input[type="time"]:focus {
       <label for="initial_tank_level">Autonomia do tanque de gasolina:</label>
       <input type="number" id="initial_tank_level" name="initial_tank_level" min="0" max="100" required>
 
-            <div class="photo-section">
+      <div class="photo-section">
         <label>Foto do Painel/Hodômetro:</label>
         <div class="photo-buttons">
           <button type="button" onclick="takePhoto('initial_tank')">Tirar Foto</button>
@@ -295,10 +250,10 @@ input[type="time"]:focus {
         <img id="initial_tank_preview" class="photo-preview" alt="Preview">
       </div>
 
-     <label for="origin">Endereço de Origem:</label>
+      <label for="origin">Endereço de Origem:</label>
       <input type="text" id="origin" name="origin" required>
 
-     <label for="car_status">Estado do Carro:</label>
+      <label for="car_status">Estado do Carro:</label>
       <input type="text" id="car_status" name="car_status" required>
 
       <label for="destination">Endereço de Destino:</label>
@@ -312,45 +267,47 @@ input[type="time"]:focus {
         </div>
         <img id="car_status_preview" class="photo-preview" alt="Preview">
       </div>
+
       <div class="radio-group">
-    <p id="textodaora"><strong>Estado do veículo</strong></p>
+        <p id="textodaora"><strong>Estado do veículo</strong></p>
 
-    <div style="margin-bottom: 15px;">
-      <strong>O Veículo está sujo?</strong><br>
-      <label class="radio-label">Sim
-        <input type="radio" name="vehicle_dirty" value="Sim">
-        <span class="checkmark"></span>
-      </label>
-      <label class="radio-label">Não
-        <input type="radio" name="vehicle_dirty" value="Não">
-        <span class="checkmark"></span>
-      </label>
-    </div>
+        <div style="margin-bottom: 15px;">
+          <strong>O Veículo está sujo?</strong><br>
+          <label class="radio-label">Sim
+            <input type="radio" name="vehicle_dirty" value="Sim">
+            <span class="checkmark"></span>
+          </label>
+          <label class="radio-label">Não
+            <input type="radio" name="vehicle_dirty" value="Não">
+            <span class="checkmark"></span>
+          </label>
+        </div>
 
-    <div style="margin-bottom: 15px;">
-      <strong>Quebrou alguma peça?</strong><br>
-      <label class="radio-label">Sim
-        <input type="radio" name="vehicle_broken" value="Sim">
-        <span class="checkmark"></span>
-      </label>
-      <label class="radio-label">Não
-        <input type="radio" name="vehicle_broken" value="Não">
-        <span class="checkmark"></span>
-      </label>
-    </div>
+        <div style="margin-bottom: 15px;">
+          <strong>Quebrou alguma peça?</strong><br>
+          <label class="radio-label">Sim
+            <input type="radio" name="vehicle_broken" value="Sim">
+            <span class="checkmark"></span>
+          </label>
+          <label class="radio-label">Não
+            <input type="radio" name="vehicle_broken" value="Não">
+            <span class="checkmark"></span>
+          </label>
+        </div>
 
-    <div style="margin-bottom: 15px;">
-      <strong>Houve danificações?</strong><br>
-      <label class="radio-label">Sim
-        <input type="radio" name="vehicle_damaged" value="Sim">
-        <span class="checkmark"></span>
-      </label>
-      <label class="radio-label">Não
-        <input type="radio" name="vehicle_damaged" value="Não">
-        <span class="checkmark"></span>
-      </label>
-    </div>
+        <div style="margin-bottom: 15px;">
+          <strong>Houve danificações?</strong><br>
+          <label class="radio-label">Sim
+            <input type="radio" name="vehicle_damaged" value="Sim">
+            <span class="checkmark"></span>
+          </label>
+          <label class="radio-label">Não
+            <input type="radio" name="vehicle_damaged" value="Não">
+            <span class="checkmark"></span>
+          </label>
+        </div>
       </div>
+
       <label for="observations">Observações:</label>
       <textarea id="observations" name="observations" rows="4"></textarea>
 
@@ -406,7 +363,7 @@ input[type="time"]:focus {
       }
     });
 
-    // Set current date and time on page load
+    // Set current date/time on page load
     document.addEventListener('DOMContentLoaded', function() {
       const now = new Date();
       const dateTimeString = now.toLocaleString('pt-BR', {
@@ -420,9 +377,41 @@ input[type="time"]:focus {
       document.getElementById('departure_time').value = dateTimeString;
     });
 
+    /* -------------- NOVA VALIDAÇÃO COMPLETA ---------------- */
     document.getElementById('initialForm').addEventListener('submit', function(e) {
       e.preventDefault();
+
+      // 1 — Validar autorizador
+      const autorizador = document.getElementById('Autorizador').value.trim();
+      if (autorizador === "Selecione") {
+        alert("Por favor, selecione um nome de autorizador.");
+        return;
+      }
+
+      // 2 — Validar fotos obrigatórias
+      if (document.getElementById('initial_tank_file').files.length === 0) {
+        alert("Por favor, tire a foto do Painel/Hodômetro.");
+        return;
+      }
+
+      if (document.getElementById('car_status_file').files.length === 0) {
+        alert("Por favor, tire a foto do Estado do Carro.");
+        return;
+      }
+
+      // 3 — Validar estado do veículo
+      const vehicleDirty = document.querySelector('input[name="vehicle_dirty"]:checked');
+      const vehicleBroken = document.querySelector('input[name="vehicle_broken"]:checked');
+      const vehicleDamaged = document.querySelector('input[name="vehicle_damaged"]:checked');
+
+      if (!vehicleDirty || !vehicleBroken || !vehicleDamaged) {
+        alert("Por favor, responda todas as perguntas sobre o estado do veículo.");
+        return;
+      }
+
+      // 4 — Enviar formulário
       const formData = new FormData(e.target);
+
       fetch('/submit_initial', {
         method: 'POST',
         body: formData,
@@ -431,7 +420,6 @@ input[type="time"]:focus {
       .then(data => {
         if (data.status === 'ok') {
           alert('Salvo com sucesso!');
-          // Redirect to login instead of resetting form
           window.location.href = '/';
         } else {
           alert('Erro ao salvar saída.');
