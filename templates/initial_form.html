@@ -2,132 +2,232 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <title>Controle de Carro - Final</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Saída de Carro</title>
-
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
       margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(100deg, #b001a8 0%, #0277b7 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 600px;
+      background: white;
       padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+      margin: 20px;
     }
 
     h1 {
       text-align: center;
-      margin-bottom: 20px;
+      color: #333;
+      font-size: 1.6rem;
     }
 
-    .container {
-      max-width: 600px;
-      margin: auto;
-      padding: 20px;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 0 10px #0002;
-    }
-
-    label {
-      font-weight: bold;
-    }
-
-    input, select, textarea {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      margin-bottom: 15px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      background: #0066cc;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-
-    button:hover {
-      background: #004c99;
+    form {
+      display: flex;
+      flex-direction: column;
     }
 
     .photo-section {
-      margin-bottom: 20px;
-    }
-
-    .photo-section img {
-      width: 100%;
-      display: none;
+      display: flex;
+      flex-direction: column;
       margin-top: 10px;
-      border-radius: 8px;
     }
 
     .photo-buttons {
       display: flex;
       gap: 10px;
+      margin-top: 5px;
     }
 
     .photo-buttons button {
-      flex: 1;
-      padding: 8px;
-      font-size: 14px;
+      padding: 8px 12px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
     }
+
+    .photo-buttons button:hover {
+      background-color: #0056b3;
+    }
+
+    .photo-preview {
+      margin-top: 10px;
+      max-width: 200px;
+      max-height: 150px;
+      border: 1px solid #ccc;
+      display: none;
+    }
+
+    label {
+      margin-top: 12px;
+      font-weight: bold;
+      font-size: 0.95rem;
+    }
+
+    input, textarea {
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 0.95rem;
+    }
+
+    input[readonly] {
+      background-color: #f9f9f9;
+      color: #666;
+    }
+
+    button {
+      margin-top: 25px;
+      padding: 12px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .checkbox-group {
+      margin-top: 15px;
+      padding: 15px;
+      border-radius: 8px;
+      background: #f3f3f3;
+      border: 1px solid #ccc;
+    }
+
+    .checkbox-group label {
+      font-weight: normal;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 0;
+    }
+
+    .checkbox-group-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 1rem;
+    }
+
   </style>
 </head>
-
 <body>
-
-  <h1>Saída do Carro</h1>
-
   <div class="container">
-    <form id="initialForm">
+    <h1>Controle de Carro - Chegada</h1>
 
-      <label for="departure_time">Data e Hora da Saída:</label>
-      <input type="text" id="departure_time" name="departure_time" readonly>
+    <form id="finalForm" enctype="multipart/form-data">
+      <input type="hidden" id="cpf" name="cpf" value="{{ cpf }}">
 
-      <label for="Autorizador">Autorizador:</label>
-      <select id="Autorizador" name="Autorizador">
-        <option>Selecione</option>
-        <option>Direção</option>
-        <option>Osmarina</option>
-        <option>Elessandra</option>
-        <option>Patrícia</option>
-      </select>
+      <label for="final_km">Km Final:</label>
+      <input type="number" id="final_km" name="final_km" required>
 
-      <!-- FOTO DO PAINEL -->
+      <label for="final_tank_level">Autonomia do tanque:</label>
+      <input type="number" id="final_tank_level" name="final_tank_level" min="0" max="100" required>
+
+      <label for="arrival_time">Data e Hora de Chegada:</label>
+      <input type="text" id="arrival_time" name="arrival_time" readonly>
+
       <div class="photo-section">
-        <label>Painel (Hodômetro):</label>
+        <label>Foto do Painel/Hodômetro:</label>
         <div class="photo-buttons">
-          <button type="button" onclick="document.getElementById('initial_tank_file').click()">Tirar Foto</button>
+          <button type="button" onclick="takePhoto('final_km')">Tirar Foto</button>
         </div>
-        <input type="file" id="initial_tank_file" name="initial_tank_photo" accept="image/*" capture="environment" style="display:none;">
-        <img id="initial_tank_preview" alt="Preview do Painel">
+        <input type="file" id="final_km_file" name="final_km_photo" accept="image/*" style="display:none;">
+        <img id="final_km_preview" class="photo-preview">
       </div>
 
-      <!-- FOTO DO ESTADO DO CARRO -->
       <div class="photo-section">
-        <label>Estado do Carro:</label>
+        <label>Foto do estado do carro:</label>
         <div class="photo-buttons">
-          <button type="button" onclick="document.getElementById('car_status_file').click()">Tirar Foto</button>
+          <button type="button" onclick="takePhoto('final_tank')">Tirar Foto</button>
         </div>
-        <input type="file" id="car_status_file" name="car_status_photo" accept="image/*" capture="environment" style="display:none;">
-        <img id="car_status_preview" alt="Preview do Carro">
+        <input type="file" id="final_tank_file" name="final_tank_photo" accept="image/*" style="display:none;">
+        <img id="final_tank_preview" class="photo-preview">
+      </div>
+
+      <!-- ✅ CHECKBOXES AQUI -->
+      <div class="checkbox-group">
+        <div class="checkbox-group-title">Checklist do Veículo</div>
+
+        <label><input type="checkbox" name="car_dirty" required> O veículo está sujo?</label>
+        <label><input type="checkbox" name="broken_parts" required> Quebrou alguma peça?</label>
+        <label><input type="checkbox" name="new_scratches" required> Há arranhões novos?</label>
+        <label><input type="checkbox" name="mechanical_issue" required> O carro apresenta problema mecânico?</label>
+        <label><input type="checkbox" name="tire_condition" required> Pneus estão em boas condições?</label>
+        <label><input type="checkbox" name="external_damage" required> Avarias externas?</label>
       </div>
 
       <label for="observations">Observações:</label>
       <textarea id="observations" name="observations" rows="4"></textarea>
 
-      <button type="submit">Salvar Saída</button>
+      <div style="display: flex; gap: 10px; margin-top: 25px;">
+        <button type="submit">Salvar Chegada</button>
+        <button type="button" onclick="window.location.href='/'" style="background-color: #f44336;">Sair</button>
+      </div>
     </form>
   </div>
 
   <script>
-    // Preenche data e hora automaticamente
-    document.addEventListener('DOMContentLoaded', function () {
+    function takePhoto(field, facingMode = 'environment') {
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: facingMode } })
+        .then(function(stream) {
+          const video = document.createElement('video');
+          video.srcObject = stream;
+          video.play();
+
+          const canvas = document.createElement('canvas');
+          canvas.width = 640;
+          canvas.height = 480;
+
+          const context = canvas.getContext('2d');
+
+          video.addEventListener('loadedmetadata', function() {
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            canvas.toBlob(function(blob) {
+              const file = new File([blob], `${field}_photo.jpg`, { type: 'image/jpeg' });
+
+              const dataTransfer = new DataTransfer();
+              dataTransfer.items.add(file);
+
+              document.getElementById(`${field}_file`).files = dataTransfer.files;
+
+              const preview = document.getElementById(`${field}_preview`);
+              preview.src = URL.createObjectURL(blob);
+              preview.style.display = 'block';
+
+              stream.getTracks().forEach(track => track.stop());
+            }, 'image/jpeg');
+          });
+        })
+        .catch(function(err) {
+          alert('Erro ao acessar câmera: ' + err.message);
+        });
+    }
+
+    // Define data/hora automática
+    document.addEventListener('DOMContentLoaded', function() {
       const now = new Date();
       const dateTimeString = now.toLocaleString('pt-BR', {
         year: 'numeric',
@@ -138,63 +238,26 @@
         second: '2-digit'
       });
 
-      const dt = document.getElementById('departure_time');
-      if (dt) dt.value = dateTimeString;
+      document.getElementById('arrival_time').value = dateTimeString;
     });
 
-    // Preview das fotos
-    document.getElementById('initial_tank_file').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        document.getElementById('initial_tank_preview').src = URL.createObjectURL(file);
-        document.getElementById('initial_tank_preview').style.display = 'block';
-      }
-    });
-
-    document.getElementById('car_status_file').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        document.getElementById('car_status_preview').src = URL.createObjectURL(file);
-        document.getElementById('car_status_preview').style.display = 'block';
-      }
-    });
-
-    // Validação + envio
-    document.getElementById('initialForm').addEventListener('submit', function(e) {
+    // Envio do formulário
+    document.getElementById('finalForm').addEventListener('submit', function(e) {
       e.preventDefault();
 
-      // Validar autorizador
-      const autorizador = document.getElementById('Autorizador').value;
-      if (autorizador === "Selecione") {
-        alert("Por favor, selecione um autorizador.");
-        return;
-      }
-
-      // Validar fotos
-      if (document.getElementById('initial_tank_file').files.length === 0) {
-        alert("Por favor, tire a foto do Painel.");
-        return;
-      }
-
-      if (document.getElementById('car_status_file').files.length === 0) {
-        alert("Por favor, tire a foto do Estado do Carro.");
-        return;
-      }
-
-      // Envio final
       const formData = new FormData(e.target);
 
-      fetch('/submit_initial', {
+      fetch('/submit_final', {
         method: 'POST',
         body: formData,
       })
-      .then(r => r.json())
+      .then(response => response.json())
       .then(data => {
-        if (data.status === "ok") {
-          alert("Salvo com sucesso!");
-          window.location.href = "/";
+        if (data.status === 'ok') {
+          alert('Chegada salva com sucesso!');
+          e.target.reset();
         } else {
-          alert("Erro ao salvar.");
+          alert('Erro ao salvar chegada.');
         }
       });
     });
