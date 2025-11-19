@@ -390,14 +390,6 @@ input[type="time"]:focus {
         });
     }
 
-    document.getElementById('initial_km_file').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        document.getElementById('initial_km_preview').src = URL.createObjectURL(file);
-        document.getElementById('initial_km_preview').style.display = 'block';
-      }
-    });
-
     document.getElementById('initial_tank_file').addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (file) {
