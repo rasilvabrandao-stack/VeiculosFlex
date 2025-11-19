@@ -129,7 +129,7 @@ def submit_initial():
         # Insert into Supabase
         if supabase:
             try:
-                supabase.table('registros').insert({
+                supabase.table('registro_kure').insert({
                     'cpf': record['cpf'],
                     'requester_name': record['requester_name'],
                     'driver_name': record['driver_name'],
@@ -217,7 +217,7 @@ def submit_final():
         # Update in Supabase
         if supabase:
             try:
-                supabase.table('registros').update({
+                supabase.table('registro_kure').update({
                     'final_km': int(data.get('final_km')) if data.get('final_km') else None,
                     'arrival_time': arrival_time,
                     'final_tank_level': data.get('final_tank_level'),
@@ -285,7 +285,7 @@ def admin_dashboard():
     if supabase:
         try:
             # Fetch all records from Supabase
-            response = supabase.table('registros').select('*').execute()
+            response = supabase.table('registro_kure').select('*').execute()
             all_records = response.data
         except Exception as e:
             # Fallback to local JSON if Supabase fails
@@ -306,7 +306,7 @@ def download_excel():
     if supabase:
         try:
             # Fetch data from Supabase
-            response = supabase.table('registros').select('*').execute()
+            response = supabase.table('registro_kure').select('*').execute()
             registros = response.data
             complete_records = [r for r in registros if r.get('status') == 'complete']
         except Exception as e:
