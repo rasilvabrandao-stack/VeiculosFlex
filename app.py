@@ -146,9 +146,8 @@ def submit_initial():
             "vehicle_broken": data.get("vehicle_broken"),
             "vehicle_damaged": data.get("vehicle_damaged"),
             "observations": data.get("observations"),
-            "initial_km_photo": photos.get("initial_km_photo"),
-            "initial_tank_photo": photos.get("initial_tank_photo"),
-            "car_status_photo": photos.get("car_status_photo"),
+            "initial_panel_photo": photos.get("initial_panel_photo"),
+            "initial_car_photo": photos.get("initial_car_photo"),
             "status": "initial",
         }
 
@@ -171,9 +170,8 @@ def submit_initial():
                     "vehicle_broken": record["vehicle_broken"],
                     "vehicle_damaged": record["vehicle_damaged"],
                     "observations": record["observations"],
-                    "initial_km_photo": record["initial_km_photo"],
-                    "initial_tank_photo": record["initial_tank_photo"],
-                    "car_status_photo": record["car_status_photo"],
+                    "initial_panel_photo": record["initial_panel_photo"],
+                    "initial_car_photo": record["initial_car_photo"],
                     "status": "initial",
                 }
 
