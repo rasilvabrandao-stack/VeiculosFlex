@@ -105,6 +105,67 @@
     button:hover {
       background-color: #45a049;
     }
+
+    .alerta {
+      font-weight: bold;
+      margin-top: 25px;
+      color: red;
+      font-size: 0.95rem;
+      text-align: center;
+    }
+
+    .meu-paragrafo {
+      color: #000;
+      font-weight: bold;
+      text-align: center;
+      font-size: 1rem;
+      margin-top: 5px;
+    }
+
+    /* Responsividade */
+    @media (max-width: 600px) {
+      .container {
+        padding: 15px;
+        border-radius: 10px;
+      }
+
+      h1 {
+        font-size: 1.4rem;
+      }
+
+      label {
+        font-size: 0.9rem;
+      }
+
+      input {
+        font-size: 0.9rem;
+        padding: 9px;
+      }
+
+      button {
+        font-size: 0.95rem;
+        padding: 10px;
+      }
+    }
+
+    /* Remove o estilo nativo dos inputs de data e hora */
+input[type="date"],
+input[type="time"] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: white;
+  color: #000;
+}
+
+/* Mantém o estilo igual aos outros inputs */
+input[type="date"]:focus,
+input[type="time"]:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+}
+
   </style>
 </head>
 <body>
@@ -144,24 +205,42 @@
       <textarea id="observations" name="observations" rows="4"></textarea>
 
       <div class="radio-group">
-        <p><strong>Estado do veículo</strong></p>
+        <p id="textodaora"><strong>Estado do veículo</strong></p>
 
         <div style="margin-bottom: 15px;">
           <strong>O Veículo está sujo?</strong><br>
-          <label>Sim <input type="radio" name="vehicle_dirty" value="Sim"></label>
-          <label>Não <input type="radio" name="vehicle_dirty" value="Não"></label>
+          <label class="radio-label">Sim
+            <input type="radio" name="vehicle_dirty" value="Sim">
+            <span class="checkmark"></span>
+          </label>
+          <label class="radio-label">Não
+            <input type="radio" name="vehicle_dirty" value="Não">
+            <span class="checkmark"></span>
+          </label>
         </div>
 
         <div style="margin-bottom: 15px;">
           <strong>Quebrou alguma peça?</strong><br>
-          <label>Sim <input type="radio" name="vehicle_broken" value="Sim"></label>
-          <label>Não <input type="radio" name="vehicle_broken" value="Não"></label>
+          <label class="radio-label">Sim
+            <input type="radio" name="vehicle_broken" value="Sim">
+            <span class="checkmark"></span>
+          </label>
+          <label class="radio-label">Não
+            <input type="radio" name="vehicle_broken" value="Não">
+            <span class="checkmark"></span>
+          </label>
         </div>
 
         <div style="margin-bottom: 15px;">
           <strong>Houve danificações?</strong><br>
-          <label>Sim <input type="radio" name="vehicle_damaged" value="Sim"></label>
-          <label>Não <input type="radio" name="vehicle_damaged" value="Não"></label>
+          <label class="radio-label">Sim
+            <input type="radio" name="vehicle_damaged" value="Sim">
+            <span class="checkmark"></span>
+          </label>
+          <label class="radio-label">Não
+            <input type="radio" name="vehicle_damaged" value="Não">
+            <span class="checkmark"></span>
+          </label>
         </div>
       </div>
 
@@ -170,12 +249,26 @@
         <button type="button" onclick="window.location.href='/'" style="background-color: #f44336;">Sair</button>
       </div>
     </form>
+
+    <p class="alerta">⚠ Mande foto do carro no momento de saída e chegada no número abaixo ⚠</p>
+    <p class="meu-paragrafo">(11) 97404-7741</p>
   </div>
 
 <script>
-// =========================
-// SISTEMA DE FOTO
-// =========================
+  const botao = document.getElementById("meuBotao");
+
+  botao.addEventListener("click", function () {
+    // Desabilita o botão
+    botao.disabled = true;
+
+    // Define tempo de cooldown (ex: 2 segundos)
+    setTimeout(() => {
+      botao.disabled = false;
+    }, 2000);
+  });
+</script>
+  
+  <script>
 function takePhoto(field, facingMode = 'environment') {
   navigator.mediaDevices.getUserMedia({ video: { facingMode } })
     .then(stream => {
@@ -208,36 +301,21 @@ function takePhoto(field, facingMode = 'environment') {
     .catch(err => alert("Erro ao acessar a câmera: " + err.message));
 }
 
-// =========================
-// DATA AUTOMÁTICA
-// =========================
 document.addEventListener('DOMContentLoaded', () => {
   const now = new Date();
   document.getElementById('arrival_time').value = now.toLocaleString('pt-BR');
 });
 
-// =========================
-// SISTEMA ANTI-CLIQUE MÚLTIPLO
-// =========================
 document.getElementById('finalForm').addEventListener('submit', async e => {
   e.preventDefault();
-
-  const botao = document.getElementById("meuBotao");
-  botao.disabled = true;
-  botao.innerText = "Enviando...";
 
   // validações
   if (!document.getElementById('final_km_file').files.length) {
     alert("Tire a foto do KM Final.");
-    botao.disabled = false;
-    botao.innerText = "Salvar Chegada";
     return;
   }
-
   if (!document.getElementById('final_tank_file').files.length) {
     alert("Tire a foto do Tanque Final.");
-    botao.disabled = false;
-    botao.innerText = "Salvar Chegada";
     return;
   }
 
@@ -255,11 +333,8 @@ document.getElementById('finalForm').addEventListener('submit', async e => {
     window.location.href = '/';
   } else {
     alert("Erro ao salvar chegada.");
-    botao.disabled = false;
-    botao.innerText = "Salvar Chegada";
   }
 });
 </script>
-
 </body>
 </html>
