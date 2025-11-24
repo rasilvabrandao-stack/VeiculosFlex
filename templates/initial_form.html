@@ -112,22 +112,6 @@
       background-color: #45a049;
     }
 
-    .alerta {
-      font-weight: bold;
-      margin-top: 25px;
-      color: red;
-      font-size: 0.95rem;
-      text-align: center;
-    }
-
-    .meu-paragrafo {
-      color: #000;
-      font-weight: bold;
-      text-align: center;
-      font-size: 1rem;
-      margin-top: 5px;
-    }
-
     #Autorizador {
       width: 100%;
       padding: 10px;
@@ -135,73 +119,6 @@
       border: 1px solid #ccc;
       border-radius: 6px;
       font-size: 0.95rem;
-    }
-
-    #textodaora {
-      text-align: center;
-      font-size: 2rem;
-    }
-
-    /* Radio buttons custom */
-    .radio-group {
-      margin-top: 10px;
-    }
-
-    .radio-label {
-      display: block;
-      position: relative;
-      padding-left: 35px;
-      margin-bottom: 12px;
-      cursor: pointer;
-      font-size: 0.95rem;
-      user-select: none;
-    }
-
-    .radio-label input {
-      position: absolute;
-      opacity: 0;
-      cursor: pointer;
-      height: 0;
-      width: 0;
-    }
-
-    .checkmark {
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 25px;
-      width: 25px;
-      background-color: #eee;
-      border-radius: 4px;
-      transition: background-color 0.3s;
-    }
-
-    .radio-label:hover input ~ .checkmark {
-      background-color: #ccc;
-    }
-
-    .radio-label input:checked ~ .checkmark {
-      background-color: #4CAF50;
-    }
-
-    .checkmark:after {
-      content: "";
-      position: absolute;
-      display: none;
-    }
-
-    .radio-label input:checked ~ .checkmark:after {
-      display: block;
-    }
-
-    .radio-label .checkmark:after {
-      left: 9px;
-      top: 5px;
-      width: 5px;
-      height: 10px;
-      border: solid white;
-      border-width: 0 3px 3px 0;
-      transform: rotate(45deg);
     }
   </style>
 </head>
@@ -267,9 +184,10 @@
         </div>
         <img id="initial_car_preview" class="photo-preview" alt="Preview">
       </div>
+
       <label for="observations">Observações:</label>
       <textarea id="observations" name="observations" rows="4"></textarea>
-      </label>
+
       <div style="display: flex; gap: 10px; margin-top: 25px;">
         <button id="meuBotao" type="submit">Salvar Saída</button>
         <button type="button" onclick="window.location.href='/'" style="background-color: #f44336;">Sair</button>
@@ -278,19 +196,6 @@
   </div>
   
 <script>
-  const botao = document.getElementById("meuBotao");
-
-  botao.addEventListener("click", function () {
-    // Desabilita o botão
-    botao.disabled = true;
-
-    // Define tempo de cooldown (ex: 2 segundos)
-    setTimeout(() => {
-      botao.disabled = false;
-    }, 1000);
-  });
-</script>
-  <script>
 function takePhoto(field, facingMode = 'environment') {
   navigator.mediaDevices.getUserMedia({ video: { facingMode } })
     .then(stream => {
@@ -308,11 +213,9 @@ function takePhoto(field, facingMode = 'environment') {
 
         canvas.toBlob(blob => {
           const file = new File([blob], `${field}_photo.jpg`, { type: 'image/jpeg' });
-
           const dt = new DataTransfer();
           dt.items.add(file);
 
-          // Corrigido: IDs corretos
           document.getElementById(`${field}_file`).files = dt.files;
           document.getElementById(`${field}_preview`).src = URL.createObjectURL(blob);
           document.getElementById(`${field}_preview`).style.display = 'block';
@@ -324,28 +227,37 @@ function takePhoto(field, facingMode = 'environment') {
     .catch(err => alert('Erro ao acessar câmera: ' + err.message));
 }
 
-// Atualiza data/hora automaticamente
 document.addEventListener('DOMContentLoaded', () => {
   const now = new Date();
   document.getElementById('departure_time').value = now.toLocaleString('pt-BR');
 });
 
-// SUBMIT CORRIGIDO
 document.getElementById('initialForm').addEventListener('submit', async e => {
   e.preventDefault();
+
+  const botao = document.getElementById("meuBotao");
+  botao.disabled = true;
+  botao.innerText = "Enviando...";
 
   const autorizador = document.getElementById('Autorizador').value;
   if (autorizador === "Selecione") {
     alert("Selecione um autorizador.");
+    botao.disabled = false;
+    botao.innerText = "Salvar Saída";
     return;
   }
 
   if (!document.getElementById('initial_panel_file').files.length) {
     alert("Tire a foto do painel.");
+    botao.disabled = false;
+    botao.innerText = "Salvar Saída";
     return;
   }
+
   if (!document.getElementById('initial_car_file').files.length) {
-    alert("Tire a foto do carro.");
+    alert("Tire uma foto do estado do carro.");
+    botao.disabled = false;
+    botao.innerText = "Salvar Saída";
     return;
   }
 
@@ -359,10 +271,12 @@ document.getElementById('initialForm').addEventListener('submit', async e => {
   const data = await response.json();
 
   if (data.status === 'ok') {
-    alert('Salvo com sucesso!');
+    alert('Saída registrada com sucesso!');
     window.location.href = '/';
   } else {
     alert('Erro ao salvar.');
+    botao.disabled = false;
+    botao.innerText = "Salvar Saída";
   }
 });
 </script>
