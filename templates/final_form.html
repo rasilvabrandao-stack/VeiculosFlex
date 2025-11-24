@@ -245,7 +245,7 @@ input[type="time"]:focus {
       </div>
 
       <div style="display: flex; gap: 10px; margin-top: 25px;">
-        <button type="submit">Salvar Chegada</button>
+        <button id="meuBotao" type="submit">Salvar Chegada</button>
         <button type="button" onclick="window.location.href='/'" style="background-color: #f44336;">Sair</button>
       </div>
     </form>
@@ -254,6 +254,20 @@ input[type="time"]:focus {
     <p class="meu-paragrafo">(11) 97404-7741</p>
   </div>
 
+<script>
+  const botao = document.getElementById("meuBotao");
+
+  botao.addEventListener("click", function () {
+    // Desabilita o botão
+    botao.disabled = true;
+
+    // Define tempo de cooldown (ex: 2 segundos)
+    setTimeout(() => {
+      botao.disabled = false;
+    }, 2000);
+  });
+</script>
+  
   <script>
 function takePhoto(field, facingMode = 'environment') {
   navigator.mediaDevices.getUserMedia({ video: { facingMode } })
