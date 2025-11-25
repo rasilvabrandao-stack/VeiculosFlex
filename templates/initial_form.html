@@ -1,9 +1,10 @@
+initial
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Controle de Carro - Final</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controle de Carro - Saída</title>
   <style>
     body {
       margin: 0;
@@ -18,18 +19,19 @@
 
     .container {
       width: 90%;
-      max-width: 600px;
+      max-width: 550px;
       background: white;
       padding: 20px;
       border-radius: 12px;
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
-      margin: 20px;
+      margin: 20px auto;
     }
 
     h1 {
       text-align: center;
       color: #333;
       font-size: 1.6rem;
+      margin-bottom: 15px;
     }
 
     form {
@@ -47,6 +49,7 @@
       display: flex;
       gap: 10px;
       margin-top: 5px;
+      flex-wrap: wrap;
     }
 
     .photo-buttons button {
@@ -85,9 +88,13 @@
       font-size: 0.95rem;
     }
 
-    input[readonly] {
-      background-color: #f9f9f9;
-      color: #666;
+    textarea {
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      resize: vertical;
     }
 
     button {
@@ -122,136 +129,153 @@
       margin-top: 5px;
     }
 
-    /* Responsividade */
-    @media (max-width: 600px) {
-      .container {
-        padding: 15px;
-        border-radius: 10px;
-      }
-
-      h1 {
-        font-size: 1.4rem;
-      }
-
-      label {
-        font-size: 0.9rem;
-      }
-
-      input {
-        font-size: 0.9rem;
-        padding: 9px;
-      }
-
-      button {
-        font-size: 0.95rem;
-        padding: 10px;
-      }
+    #Autorizador {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 0.95rem;
     }
 
-    /* Remove o estilo nativo dos inputs de data e hora */
-input[type="date"],
-input[type="time"] {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-color: white;
-  color: #000;
-}
+    #textodaora {
+      text-align: center;
+      font-size: 2rem;
+    }
 
-/* Mantém o estilo igual aos outros inputs */
-input[type="date"]:focus,
-input[type="time"]:focus {
-  outline: none;
-  border-color: #4CAF50;
-  box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
-}
+    /* Radio buttons custom */
+    .radio-group {
+      margin-top: 10px;
+    }
 
+    .radio-label {
+      display: block;
+      position: relative;
+      padding-left: 35px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      user-select: none;
+    }
+
+    .radio-label input {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+      height: 0;
+      width: 0;
+    }
+
+    .checkmark {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 25px;
+      width: 25px;
+      background-color: #eee;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+    }
+
+    .radio-label:hover input ~ .checkmark {
+      background-color: #ccc;
+    }
+
+    .radio-label input:checked ~ .checkmark {
+      background-color: #4CAF50;
+    }
+
+    .checkmark:after {
+      content: "";
+      position: absolute;
+      display: none;
+    }
+
+    .radio-label input:checked ~ .checkmark:after {
+      display: block;
+    }
+
+    .radio-label .checkmark:after {
+      left: 9px;
+      top: 5px;
+      width: 5px;
+      height: 10px;
+      border: solid white;
+      border-width: 0 3px 3px 0;
+      transform: rotate(45deg);
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Controle de Carro - Chegada</h1>
-    <form id="finalForm" enctype="multipart/form-data">
+    <h1>Controle de Carro - Saída</h1>
+    <form id="initialForm" enctype="multipart/form-data" method="post">
       <input type="hidden" id="cpf" name="cpf" value="{{ cpf }}">
 
-      <label for="final_km">Km Final:</label>
-      <input type="number" id="final_km" name="final_km" required>
+      <label for="requester_name">Nome do Autorizador:</label>
+      <select id="Autorizador" name="requester_name">
+        <Option> Selecione </Option>
+        <Option> Iseli </Option>
+        <Option> Elis </Option>
+        <Option> Will </Option>
+        <Option> William </Option>
+        <Option> Ronaldo </Option>
+        <Option> Gustavo </Option>
+        <Option> Jesus </Option>
+        <Option> Bruno </Option>
+        <Option> Ivan </Option>
+        <Option> Thiago Coelho </Option>
+      </select>
 
-      <label for="final_tank_level">Nível Final do Tanque (%):</label>
-      <input type="number" id="final_tank_level" name="final_tank_level" min="0" max="100" required>
+      <label for="reason">Motivo:</label>
+      <input type="text" id="reason" name="reason" required>
 
-      <label for="arrival_time">Data e Hora de Chegada:</label>
-      <input type="text" id="arrival_time" name="arrival_time" readonly>
+      <label for="driver_name">Nome do Motorista:</label>
+      <input type="text" id="driver_name" name="driver_name" value="{{ driver_name }}" required>
+
+      <label for="departure_time">Data e Horário de Saída:</label>
+      <input type="text" id="departure_time" name="departure_time" readonly>
+
+      <label for="initial_km">Km Inicial:</label>
+      <input type="number" id="initial_km" name="initial_km" required>
+
+      <label for="initial_tank_level">Autonomia do tanque de gasolina:</label>
+      <input type="number" id="initial_tank_level" name="initial_tank_level" min="0" max="100" required>
 
       <div class="photo-section">
-        <label>Foto do Km Final:</label>
-        <input type="file" id="final_km_file" name="final_km_photo" accept="image/*" style="display: none;">
+        <label>Foto do Painel/Hodômetro:</label>
         <div class="photo-buttons">
-          <button type="button" onclick="takePhoto('final_km')">Tirar Foto</button>
+          <button type="button" onclick="takePhoto('initial_panel')">Tirar Foto</button>
+          <input type="file" id="initial_panel_file" name="initial_panel_photo" accept="image/*" style="display: none;">
         </div>
-        <img id="final_km_preview" class="photo-preview" alt="Preview">
+        <img id="initial_panel_preview" class="photo-preview" alt="Preview">
       </div>
+
+      <label for="origin">Endereço de Origem:</label>
+      <input type="text" id="origin" name="origin" required>
+
+      <label for="car_status">Estado do Carro:</label>
+      <input type="text" id="car_status" name="car_status" required>
+
+      <label for="destination">Endereço de Destino:</label>
+      <input type="text" id="destination" name="destination" required>
 
       <div class="photo-section">
-        <label>Foto do Nível Final do Tanque:</label>
-        <input type="file" id="final_tank_file" name="final_tank_photo" accept="image/*" style="display: none;">
+        <label>Foto do Estado do Carro:</label>
         <div class="photo-buttons">
-          <button type="button" onclick="takePhoto('final_tank')">Tirar Foto</button>
+          <button type="button" onclick="takePhoto('initial_car')">Tirar Foto</button>
+          <input type="file" id="initial_car_file" name="initial_car_photo" accept="image/*" style="display: none;">
         </div>
-        <img id="final_tank_preview" class="photo-preview" alt="Preview">
+        <img id="initial_car_preview" class="photo-preview" alt="Preview">
       </div>
-
       <label for="observations">Observações:</label>
       <textarea id="observations" name="observations" rows="4"></textarea>
-
-      <div class="radio-group">
-        <p id="textodaora"><strong>Estado do veículo</strong></p>
-
-        <div style="margin-bottom: 15px;">
-          <strong>O Veículo está sujo?</strong><br>
-          <label class="radio-label">Sim
-            <input type="radio" name="vehicle_dirty" value="Sim">
-            <span class="checkmark"></span>
-          </label>
-          <label class="radio-label">Não
-            <input type="radio" name="vehicle_dirty" value="Não">
-            <span class="checkmark"></span>
-          </label>
-        </div>
-
-        <div style="margin-bottom: 15px;">
-          <strong>Quebrou alguma peça?</strong><br>
-          <label class="radio-label">Sim
-            <input type="radio" name="vehicle_broken" value="Sim">
-            <span class="checkmark"></span>
-          </label>
-          <label class="radio-label">Não
-            <input type="radio" name="vehicle_broken" value="Não">
-            <span class="checkmark"></span>
-          </label>
-        </div>
-
-        <div style="margin-bottom: 15px;">
-          <strong>Houve danificações?</strong><br>
-          <label class="radio-label">Sim
-            <input type="radio" name="vehicle_damaged" value="Sim">
-            <span class="checkmark"></span>
-          </label>
-          <label class="radio-label">Não
-            <input type="radio" name="vehicle_damaged" value="Não">
-            <span class="checkmark"></span>
-          </label>
-        </div>
-      </div>
-
+      </label>
       <div style="display: flex; gap: 10px; margin-top: 25px;">
-        <button type="submit">Salvar Chegada</button>
+        <button type="submit">Salvar Saída</button>
         <button type="button" onclick="window.location.href='/'" style="background-color: #f44336;">Sair</button>
       </div>
     </form>
-
-    <p class="alerta">⚠ Mande foto do carro no momento de saída e chegada no número abaixo ⚠</p>
-    <p class="meu-paragrafo">(11) 97404-7741</p>
   </div>
 
   <script>
@@ -260,54 +284,62 @@ function takePhoto(field, facingMode = 'environment') {
     .then(stream => {
       const video = document.createElement('video');
       video.srcObject = stream;
+      video.play();
 
-      video.onloadeddata = () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = 640;
-        canvas.height = 480;
-        const ctx = canvas.getContext('2d');
+      const canvas = document.createElement('canvas');
+      canvas.width = 640;
+      canvas.height = 480;
+      const ctx = canvas.getContext('2d');
 
+      video.addEventListener('loadedmetadata', () => {
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
         canvas.toBlob(blob => {
-          const file = new File([blob], `${field}.jpg`, { type: 'image/jpeg' });
+          const file = new File([blob], `${field}_photo.jpg`, { type: 'image/jpeg' });
+
           const dt = new DataTransfer();
           dt.items.add(file);
 
+          // Corrigido: IDs corretos
           document.getElementById(`${field}_file`).files = dt.files;
           document.getElementById(`${field}_preview`).src = URL.createObjectURL(blob);
           document.getElementById(`${field}_preview`).style.display = 'block';
 
-          stream.getTracks().forEach(t => t.stop());
+          stream.getTracks().forEach(track => track.stop());
         }, 'image/jpeg');
-      };
-
-      video.play();
+      });
     })
-    .catch(err => alert("Erro ao acessar a câmera: " + err.message));
+    .catch(err => alert('Erro ao acessar câmera: ' + err.message));
 }
 
+// Atualiza data/hora automaticamente
 document.addEventListener('DOMContentLoaded', () => {
   const now = new Date();
-  document.getElementById('arrival_time').value = now.toLocaleString('pt-BR');
+  document.getElementById('departure_time').value = now.toLocaleString('pt-BR');
 });
 
-document.getElementById('finalForm').addEventListener('submit', async e => {
+// SUBMIT CORRIGIDO
+document.getElementById('initialForm').addEventListener('submit', async e => {
   e.preventDefault();
 
-  // validações
-  if (!document.getElementById('final_km_file').files.length) {
-    alert("Tire a foto do KM Final.");
+  const autorizador = document.getElementById('Autorizador').value;
+  if (autorizador === "Selecione") {
+    alert("Selecione um autorizador.");
     return;
   }
-  if (!document.getElementById('final_tank_file').files.length) {
-    alert("Tire a foto do Tanque Final.");
+
+  if (!document.getElementById('initial_panel_file').files.length) {
+    alert("Tire a foto do painel.");
+    return;
+  }
+  if (!document.getElementById('initial_car_file').files.length) {
+    alert("Tire a foto do carro.");
     return;
   }
 
   const formData = new FormData(e.target);
 
-  const response = await fetch('/submit_final', {
+  const response = await fetch('/submit_initial', {
     method: 'POST',
     body: formData
   });
@@ -315,10 +347,10 @@ document.getElementById('finalForm').addEventListener('submit', async e => {
   const data = await response.json();
 
   if (data.status === 'ok') {
-    alert("Chegada registrada!");
+    alert('Salvo com sucesso!');
     window.location.href = '/';
   } else {
-    alert("Erro ao salvar chegada.");
+    alert('Erro ao salvar.');
   }
 });
 </script>
