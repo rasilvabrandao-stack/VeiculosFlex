@@ -1,4 +1,3 @@
-app.py
 from flask import Flask, request, render_template, jsonify, send_file
 import json
 import os
