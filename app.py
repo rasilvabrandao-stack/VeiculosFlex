@@ -1,3 +1,4 @@
+app.py
 from flask import Flask, request, render_template, jsonify, send_file
 import json
 import os
@@ -5,7 +6,7 @@ from datetime import datetime
 from io import BytesIO
 from supabase import create_client, Client
 import requests
-from PIL import Image # type: ignore
+from PIL import Image  # pyright: ignore[reportMissingImports]
 import io
 import traceback
 
@@ -308,17 +309,16 @@ def submit_final():
 
         # Enviar ao Apps Script
         try:
-         record = {
-    "cpf": cpf,
-    "final_km": data.get("final_km"),
-    "arrival_time": arrival_time,
-    "final_tank_level": data.get("final_tank_level"),
-    "observations": data.get("observations"),
-    "final_km_photo": photos.get("final_km_photo"),
-    "final_tank_photo": photos.get("final_tank_photo"),
-    "status": "complete",
-}
-
+            record = {
+                "cpf": cpf,
+                "final_km": data.get("final_km"),
+                "arrival_time": arrival_time,
+                "final_tank_level": data.get("final_tank_level"),
+                "observations": data.get("observations"),
+                "final_km_photo": photos.get("final_km_photo"),
+                "final_tank_photo": photos.get("final_tank_photo"),
+                "status": "complete",
+            }
             resp = requests.post(APPS_SCRIPT_URL, json={"type": "final", "data": record}, timeout=10)
             print("=== APPS SCRIPT RESPONSE (final) ===")
             print("status:", resp.status_code)
