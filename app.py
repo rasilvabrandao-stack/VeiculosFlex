@@ -9,7 +9,19 @@ from PIL import Image  # pyright: ignore[reportMissingImports]
 import io
 import traceback
 
+from flask import Flask, request, render_template, jsonify, send_file, redirect, url_for, session
+import json
+import os
+from datetime import datetime
+from io import BytesIO
+from supabase import create_client, Client
+import requests
+from PIL import Image  # pyright: ignore[reportMissingImports]
+import io
+import traceback
+
 app = Flask(__name__)
+app.secret_key = 'supersecretkey'  # For session management, change in production
 
 # === Configurações ===
 CAR_RECORDS_FILE = "car_records.json"
@@ -338,6 +350,7 @@ def submit_final():
 # ============================================================
 # View records
 # ============================================================
+
 @app.route("/view_records")
 def view_records():
     complete = []
@@ -351,6 +364,145 @@ def view_records():
             traceback.print_exc()
             complete = []
     return render_template("registro.html", records=complete)
+
+import pandas as pd # type: ignore
+from flask import send_file
+import io
+
+from functools import wraps
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('admin_logged_in'):
+            return redirect(url_for('admin_login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+@app.route("/admin/login")
+def admin_login():
+    if session.get('admin_logged_in'):
+        return redirect(url_for('admin_dashboard'))
+    return render_template("admin_login.html")
+
+@app.route("/admin_login")
+def admin_login_underscore():
+    return redirect(url_for('admin_login'))
+
+@app.route("/submit_admin_login", methods=["POST"])
+def submit_admin_login():
+    data = request.get_json()
+    username = data.get("username") if data else None
+    password = data.get("password") if data else None
+    
+    # Simple hardcoded credentials; change as needed or improve with proper auth
+    if username == "admin" and password == "adminpass":
+        session['admin_logged_in'] = True
+        return jsonify({"redirect": url_for('admin_dashboard')})
+    else:
+        return jsonify({"error": "Invalid credentials"}), 401
+
+@app.route("/admin/logout")
+def admin_logout():
+    session.pop('admin_logged_in', None)
+    return redirect(url_for('admin_login'))
+
+@app.route("/admin")
+@login_required
+def admin_dashboard():
+    records = []
+    if supabase:
+        try:
+            result = supabase.table("registro_kure").select("*").execute()
+            print("admin_dashboard records:", getattr(result, "data", None), getattr(result, "error", None))
+            records = result.data or []
+        except Exception as e:
+            print("Erro ao consultar Supabase:", e)
+            traceback.print_exc()
+    return render_template("admin_dashboard.html", records=records)
+
+@app.route("/admin/delete/<int:record_id>", methods=["DELETE"])
+@login_required
+def admin_delete_record(record_id):
+    if not supabase:
+        return jsonify({"status": "error", "message": "Supabase not initialized"}), 500
+    try:
+        result = supabase.table("registro_kure").delete().eq("id", record_id).execute()
+        print(f"Deleted record id {record_id}: ", getattr(result, "data", None), getattr(result, "error", None))
+        if getattr(result, "error", None):
+            return jsonify({"status": "error", "message": str(result.error)}), 500
+        return jsonify({"status": "success", "message": f"Record {record_id} deleted"})
+    except Exception as e:
+        print("Error deleting record:", e)
+        traceback.print_exc()
+        return jsonify({"status": "error", "message": "Server error"}), 500
+
+@app.route("/download_excel")
+@login_required
+def download_excel():
+    try:
+        records = []
+        if supabase:
+            try:
+                result = supabase.table("registro_kure").select("*").execute()
+                records = result.data or []
+            except Exception as e:
+                print("Erro ao consultar Supabase:", e)
+                traceback.print_exc()
+
+        # Mapeamento de colunas para exibição
+        rename_map = {
+            "cpf": "CPF",
+            "requester_name": "Nome do Solicitante",
+            "driver_name": "Nome do Motorista",
+            "date": "Data",
+            "initial_km": "Km Inicial",
+            "departure_time": "Horário de Saída",
+            "origin": "Origem",
+            "initial_tank_level": "Nível Inicial do Tanque",
+            "destination": "Destino",
+            "final_km": "Km Final",
+            "arrival_time": "Hora de Chegada",
+            "final_tank_level": "Nível Final do Tanque",
+        }
+
+        # Criar DataFrame seguro
+        df = pd.DataFrame(records)
+
+        # Se estiver vazio, cria colunas mesmo assim
+        if df.empty:
+            df = pd.DataFrame(columns=list(rename_map.keys()))
+
+        # Renomear colunas
+        df = df.rename(columns=rename_map)
+
+        # Selecionar apenas colunas existentes
+        cols = [col for col in rename_map.values() if col in df.columns]
+        if not cols:
+            return "Nenhum dado disponível para exportar", 400
+        df = df[cols]
+
+        # Converter todos os dados para string para evitar problemas de tipos complexos
+        for col in df.columns:
+            df[col] = df[col].astype(str)
+
+        # Criar Excel em memória
+        output = io.BytesIO()
+        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+            df.to_excel(writer, index=False, sheet_name='Registros')
+        output.seek(0)
+
+        return send_file(
+            output,
+            as_attachment=True,
+            download_name='registros_controle_carro.xlsx',
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+
+    except Exception as e:
+        print("Erro no download_excel:", e)
+        traceback.print_exc()
+        return "Erro interno no servidor ao gerar arquivo Excel", 500
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
