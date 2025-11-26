@@ -292,30 +292,46 @@ document.addEventListener('DOMContentLoaded', () => {
 document.getElementById('finalForm').addEventListener('submit', async e => {
   e.preventDefault();
 
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Enviando...';
+
   // validações
   if (!document.getElementById('final_km_file').files.length) {
     alert("Tire a foto do KM Final.");
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Salvar Chegada';
     return;
   }
   if (!document.getElementById('final_tank_file').files.length) {
     alert("Tire a foto do Tanque Final.");
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Salvar Chegada';
     return;
   }
 
   const formData = new FormData(e.target);
 
-  const response = await fetch('/submit_final', {
-    method: 'POST',
-    body: formData
-  });
+  try {
+    const response = await fetch('/submit_final', {
+      method: 'POST',
+      body: formData
+    });
 
-  const data = await response.json();
+    const data = await response.json();
 
-  if (data.status === 'ok') {
-    alert("Chegada registrada!");
-    window.location.href = '/';
-  } else {
-    alert("Erro ao salvar chegada.");
+    if (data.status === 'ok') {
+      alert("Chegada registrada!");
+      window.location.href = '/';
+    } else {
+      alert("Erro ao salvar chegada.");
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Salvar Chegada';
+    }
+  } catch (error) {
+    alert('Erro de rede. Tente novamente.');
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Salvar Chegada';
   }
 });
 </script>
