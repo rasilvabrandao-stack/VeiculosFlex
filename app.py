@@ -162,7 +162,7 @@ def submit_initial():
         cpf = data.get("cpf")
         now = datetime.now()
         parsed_date = now.date().isoformat()
-        parsed_departure_time = now.time().isoformat()
+        parsed_departure_time = now.strftime('%H:%M:%S')
 
         # Processar fotos do request.files (chaves vindas do formulário)
         photos = {}
@@ -282,7 +282,7 @@ def submit_final():
                 photos[key] = upload_image_to_supabase(file, cpf or "unknown", key)
 
         now = datetime.now()
-        arrival_time = now.time().isoformat()
+        arrival_time = now.strftime('%H:%M:%S')
 
         update_payload = {
             "final_km": safe_int(data.get("final_km")),
@@ -490,6 +490,13 @@ def download_excel():
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
             df.to_excel(writer, index=False, sheet_name='Registros')
+
+            # Ajustar larguras das colunas para garantir espaço suficiente para o texto
+            workbook = writer.book
+            worksheet = writer.sheets['Registros']
+            for i, col in enumerate(df.columns):
+                # Definir largura mínima de 20 caracteres para cada coluna
+                worksheet.set_column(i, i, 20)
         output.seek(0)
 
         return send_file(
