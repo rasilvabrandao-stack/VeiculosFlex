@@ -14,18 +14,21 @@
             align-items: flex-start;
         }
 
-     .container { 
-         width: 90%; 
-         background: white; 
-         padding: 20px; 
-         border-radius: 12px; 
+     .container {
+         width: 90%;
+         min-width: 1260px;
+         background: white;
+         padding: 20px;
+         border-radius: 12px;
          box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
-         margin: 20px; 
+         margin: 20px;
+         overflow-x: auto;
      }
 
         table {
             border-collapse: collapse;
             width: 100%;
+            min-width: 1220px;
         }
         th, td {
             padding: 8px 12px;
@@ -57,48 +60,50 @@
         <button onclick="window.location.href='/download_excel'" style="padding: 8px 12px; cursor: pointer; background-color: #007BFF; color: white; border: none; border-radius: 3px;">Download Excel</button>
     </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>CPF</th>
-                <th>Nome do Solicitante</th>
-                <th>Nome do Motorista</th>
-                <th>Data</th>
-                <th>Km Inicial</th>
-                <th>Horário de Saída</th>
-                <th>Origem</th>
-                <th>Nível Inicial do Tanque</th>
-                <th>Destino</th>
-                <th>Finalizado</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for record in records %}
-            <tr id="record-row-{{ record.get('id') }}">
-                <td>{{ record.get('id') }}</td>
-                <td>{{ record.get('cpf') }}</td>
-                <td>{{ record.get('requester_name') }}</td>
-                <td>{{ record.get('driver_name') }}</td>
-                <td>{{ record.get('date') }}</td>
-                <td>{{ record.get('initial_km') }}</td>
-                <td>{{ record.get('departure_time') }}</td>
-                <td>{{ record.get('origin') }}</td>
-                <td>{{ record.get('initial_tank_level') }}</td>
-                <td>{{ record.get('destination') }}</td>
-                <td>{{ 'Sim' if record.get('status') == 'complete' else 'Não' }}</td>
-                <td>
-                    <button class="delete-btn" data-id="{{ record.get('id') }}">Deletar</button>
-                </td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="12">Nenhum registro encontrado.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>CPF</th>
+                    <th>Nome do Solicitante</th>
+                    <th>Nome do Motorista</th>
+                    <th>Data</th>
+                    <th>Km Inicial</th>
+                    <th>Horário de Saída</th>
+                    <th>Origem</th>
+                    <th>Nível Inicial do Tanque</th>
+                    <th>Destino</th>
+                    <th>Finalizado</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in records %}
+                <tr id="record-row-{{ record.get('id') }}">
+                    <td>{{ record.get('id') }}</td>
+                    <td>{{ record.get('cpf') }}</td>
+                    <td>{{ record.get('requester_name') }}</td>
+                    <td>{{ record.get('driver_name') }}</td>
+                    <td>{{ record.get('date') }}</td>
+                    <td>{{ record.get('initial_km') }}</td>
+                    <td>{{ record.get('departure_time') }}</td>
+                    <td>{{ record.get('origin') }}</td>
+                    <td>{{ record.get('initial_tank_level') }}</td>
+                    <td>{{ record.get('destination') }}</td>
+                    <td>{{ 'Sim' if record.get('status') == 'complete' else 'Não' }}</td>
+                    <td>
+                        <button class="delete-btn" data-id="{{ record.get('id') }}">Deletar</button>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="12">Nenhum registro encontrado.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
     <script>
         function deleteRecord(id) {
