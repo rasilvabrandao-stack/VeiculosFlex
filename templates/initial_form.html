@@ -321,35 +321,53 @@ document.addEventListener('DOMContentLoaded', () => {
 document.getElementById('initialForm').addEventListener('submit', async e => {
   e.preventDefault();
 
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Enviando...';
+
   const autorizador = document.getElementById('Autorizador').value;
   if (autorizador === "Selecione") {
     alert("Selecione um autorizador.");
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Salvar Saída';
     return;
   }
 
   if (!document.getElementById('initial_panel_file').files.length) {
     alert("Tire a foto do painel.");
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Salvar Saída';
     return;
   }
   if (!document.getElementById('initial_car_file').files.length) {
     alert("Tire a foto do carro.");
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Salvar Saída';
     return;
   }
 
   const formData = new FormData(e.target);
 
-  const response = await fetch('/submit_initial', {
-    method: 'POST',
-    body: formData
-  });
+  try {
+    const response = await fetch('/submit_initial', {
+      method: 'POST',
+      body: formData
+    });
 
-  const data = await response.json();
+    const data = await response.json();
 
-  if (data.status === 'ok') {
-    alert('Salvo com sucesso!');
-    window.location.href = '/';
-  } else {
-    alert('Erro ao salvar.');
+    if (data.status === 'ok') {
+      alert('Salvo com sucesso!');
+      window.location.href = '/';
+    } else {
+      alert('Erro ao salvar.');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Salvar Saída';
+    }
+  } catch (error) {
+    alert('Erro de rede. Tente novamente.');
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Salvar Saída';
   }
 });
 </script>
