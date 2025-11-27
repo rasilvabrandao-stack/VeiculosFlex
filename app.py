@@ -152,7 +152,7 @@ def submit_initial():
         print("submit_initial - form data:", data)
 
         # Validação: campos obrigatórios conforme schema
-        required = ["requester_name", "driver_name", "initial_km", "origin", "initial_tank_level", "destination"]
+        required = ["cpf", "requester_name", "driver_name", "initial_km", "origin", "initial_tank_level", "destination"]
         missing = [f for f in required if not data.get(f)]
         if missing:
             msg = f"Campos obrigatórios faltando: {', '.join(missing)}"
