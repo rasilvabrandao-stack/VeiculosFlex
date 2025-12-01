@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>Controle de Carro - Final</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
     body {
       margin: 0;
@@ -106,71 +107,54 @@
       background-color: #45a049;
     }
 
-    .alerta {
-      font-weight: bold;
-      margin-top: 25px;
-      color: red;
-      font-size: 0.95rem;
+    /* MODAL DE CÂMERA */
+    #cameraModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    #cameraBox {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
       text-align: center;
+      width: 300px;
     }
 
-    .meu-paragrafo {
-      color: #000;
-      font-weight: bold;
-      text-align: center;
-      font-size: 1rem;
-      margin-top: 5px;
+    #cameraPreview {
+      width: 100%;
+      border-radius: 10px;
+      background: black;
     }
 
-    /* Responsividade */
-    @media (max-width: 600px) {
-      .container {
-        padding: 15px;
-        border-radius: 10px;
-      }
-
-      h1 {
-        font-size: 1.4rem;
-      }
-
-      label {
-        font-size: 0.9rem;
-      }
-
-      input {
-        font-size: 0.9rem;
-        padding: 9px;
-      }
-
-      button {
-        font-size: 0.95rem;
-        padding: 10px;
-      }
+    #cameraButtons {
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
     }
 
-    /* Remove o estilo nativo dos inputs de data e hora */
-input[type="date"],
-input[type="time"] {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-color: white;
-  color: #000;
-}
-
-/* Mantém o estilo igual aos outros inputs */
-input[type="date"]:focus,
-input[type="time"]:focus {
-  outline: none;
-  border-color: #4CAF50;
-  box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
-}
+    #cameraButtons button {
+      flex: 1;
+      margin: 5px;
+      padding: 10px;
+      font-size: 0.9rem;
+    }
 
   </style>
 </head>
+
 <body>
   <div class="container">
     <h1>Controle de Carro - Chegada</h1>
+
     <form id="finalForm" enctype="multipart/form-data">
       <input type="hidden" id="cpf" name="cpf" value="{{ cpf }}">
 
@@ -183,66 +167,28 @@ input[type="time"]:focus {
       <label for="arrival_time">Data e Hora de Chegada:</label>
       <input type="text" id="arrival_time" name="arrival_time" readonly>
 
+      <!-- FOTO KM FINAL -->
       <div class="photo-section">
         <label>Foto do Km Final:</label>
         <input type="file" id="final_km_file" name="final_km_photo" accept="image/*" style="display: none;">
         <div class="photo-buttons">
-          <button type="button" onclick="takePhoto('final_km')">Tirar Foto</button>
+          <button type="button" onclick="openCamera('final_km')">Tirar Foto</button>
         </div>
         <img id="final_km_preview" class="photo-preview" alt="Preview">
       </div>
 
+      <!-- FOTO TANQUE FINAL -->
       <div class="photo-section">
         <label>Foto do Nível Final do Tanque:</label>
         <input type="file" id="final_tank_file" name="final_tank_photo" accept="image/*" style="display: none;">
         <div class="photo-buttons">
-          <button type="button" onclick="takePhoto('final_tank')">Tirar Foto</button>
+          <button type="button" onclick="openCamera('final_tank')">Tirar Foto</button>
         </div>
         <img id="final_tank_preview" class="photo-preview" alt="Preview">
       </div>
 
       <label for="observations">Observações:</label>
       <textarea id="observations" name="observations" rows="4"></textarea>
-
-      <div class="radio-group">
-        <p id="textodaora"><strong>Estado do veículo</strong></p>
-
-        <div style="margin-bottom: 15px;">
-          <strong>O Veículo está sujo?</strong><br>
-          <label class="radio-label">Sim
-            <input type="radio" name="vehicle_dirty" value="Sim">
-            <span class="checkmark"></span>
-          </label>
-          <label class="radio-label">Não
-            <input type="radio" name="vehicle_dirty" value="Não">
-            <span class="checkmark"></span>
-          </label>
-        </div>
-
-        <div style="margin-bottom: 15px;">
-          <strong>Quebrou alguma peça?</strong><br>
-          <label class="radio-label">Sim
-            <input type="radio" name="vehicle_broken" value="Sim">
-            <span class="checkmark"></span>
-          </label>
-          <label class="radio-label">Não
-            <input type="radio" name="vehicle_broken" value="Não">
-            <span class="checkmark"></span>
-          </label>
-        </div>
-
-        <div style="margin-bottom: 15px;">
-          <strong>Houve danificações?</strong><br>
-          <label class="radio-label">Sim
-            <input type="radio" name="vehicle_damaged" value="Sim">
-            <span class="checkmark"></span>
-          </label>
-          <label class="radio-label">Não
-            <input type="radio" name="vehicle_damaged" value="Não">
-            <span class="checkmark"></span>
-          </label>
-        </div>
-      </div>
 
       <div style="display: flex; gap: 10px; margin-top: 25px;">
         <button type="submit">Salvar Chegada</button>
@@ -251,89 +197,112 @@ input[type="time"]:focus {
     </form>
   </div>
 
+  <!-- MODAL DE CÂMERA -->
+  <div id="cameraModal">
+    <div id="cameraBox">
+      <video id="cameraPreview" autoplay></video>
+
+      <div id="cameraButtons">
+        <button onclick="capturePhoto()">Capturar</button>
+        <button onclick="closeCamera()" style="background:#cc0000;">Fechar</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-function takePhoto(field, facingMode = 'environment') {
-  navigator.mediaDevices.getUserMedia({ video: { facingMode } })
-    .then(stream => {
-      const video = document.createElement('video');
-      video.srcObject = stream;
+    let currentField = "";
+    let currentStream = null;
 
-      video.onloadeddata = () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = 640;
-        canvas.height = 480;
-        const ctx = canvas.getContext('2d');
+    function openCamera(field) {
+      currentField = field;
+      document.getElementById("cameraModal").style.display = "flex";
 
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: "environment",
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        }
+      }).then(stream => {
+        currentStream = stream;
+        document.getElementById("cameraPreview").srcObject = stream;
+      }).catch(err => {
+        alert("Erro ao acessar a câmera: " + err.message);
+      });
+    }
 
-        canvas.toBlob(blob => {
-          const file = new File([blob], `${field}.jpg`, { type: 'image/jpeg' });
-          const dt = new DataTransfer();
-          dt.items.add(file);
+    function closeCamera() {
+      document.getElementById("cameraModal").style.display = "none";
+      if (currentStream) {
+        currentStream.getTracks().forEach(t => t.stop());
+      }
+    }
 
-          document.getElementById(`${field}_file`).files = dt.files;
-          document.getElementById(`${field}_preview`).src = URL.createObjectURL(blob);
-          document.getElementById(`${field}_preview`).style.display = 'block';
+    function capturePhoto() {
+      const video = document.getElementById("cameraPreview");
+      const canvas = document.createElement("canvas");
+      canvas.width = 1280;
+      canvas.height = 720;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-          stream.getTracks().forEach(t => t.stop());
-        }, 'image/jpeg');
-      };
+      canvas.toBlob(blob => {
+        const file = new File([blob], `${currentField}.jpg`, { type: "image/jpeg" });
 
-      video.play();
-    })
-    .catch(err => alert("Erro ao acessar a câmera: " + err.message));
-}
+        const dt = new DataTransfer();
+        dt.items.add(file);
 
-document.addEventListener('DOMContentLoaded', () => {
-  const now = new Date();
-  document.getElementById('arrival_time').value = now.toLocaleString('pt-BR');
-});
+        document.getElementById(`${currentField}_file`).files = dt.files;
 
-document.getElementById('finalForm').addEventListener('submit', async e => {
-  e.preventDefault();
+        const preview = document.getElementById(`${currentField}_preview`);
+        preview.src = URL.createObjectURL(blob);
+        preview.style.display = "block";
 
-  const submitBtn = e.target.querySelector('button[type="submit"]');
-  submitBtn.disabled = true;
-  submitBtn.textContent = 'Enviando...';
+        closeCamera();
+      }, "image/jpeg");
+    }
 
-  // validações
-  if (!document.getElementById('final_km_file').files.length) {
-    alert("Tire a foto do KM Final.");
-    submitBtn.disabled = false;
-    submitBtn.textContent = 'Salvar Chegada';
-    return;
-  }
-  if (!document.getElementById('final_tank_file').files.length) {
-    alert("Tire a foto do Tanque Final.");
-    submitBtn.disabled = false;
-    submitBtn.textContent = 'Salvar Chegada';
-    return;
-  }
-
-  const formData = new FormData(e.target);
-
-  try {
-    const response = await fetch('/submit_final', {
-      method: 'POST',
-      body: formData
+    document.addEventListener("DOMContentLoaded", () => {
+      const now = new Date();
+      document.getElementById("arrival_time").value = now.toLocaleString("pt-BR");
     });
 
-    const data = await response.json();
+    document.getElementById("finalForm").addEventListener("submit", async e => {
+      e.preventDefault();
 
-    if (data.status === 'ok') {
-      alert("Chegada registrada!");
-      window.location.href = '/';
-    } else {
-      alert("Erro ao salvar chegada.");
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Salvar Chegada';
-    }
-  } catch (error) {
-    alert('Erro de rede. Tente novamente.');
-    submitBtn.disabled = false;
-    submitBtn.textContent = 'Salvar Chegada';
-  }
-});
-</script>
+      const btn = e.target.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      btn.textContent = "Enviando...";
+
+      if (!document.getElementById("final_km_file").files.length) {
+        alert("Tire a foto do KM Final.");
+        btn.disabled = false; btn.textContent = "Salvar Chegada"; return;
+      }
+      if (!document.getElementById("final_tank_file").files.length) {
+        alert("Tire a foto do Tanque Final.");
+        btn.disabled = false; btn.textContent = "Salvar Chegada"; return;
+      }
+
+      const formData = new FormData(e.target);
+
+      try {
+        const response = await fetch("/submit_final", { method: "POST", body: formData });
+        const data = await response.json();
+
+        if (data.status === "ok") {
+          alert("Chegada registrada!");
+          window.location.href = "/";
+        } else {
+          alert("Erro ao salvar.");
+        }
+      } catch {
+        alert("Erro de rede.");
+      }
+
+      btn.disabled = false;
+      btn.textContent = "Salvar Chegada";
+    });
+  </script>
+
 </body>
 </html>
