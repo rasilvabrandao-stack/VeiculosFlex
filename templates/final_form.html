@@ -107,13 +107,13 @@
       background-color: #45a049;
     }
 
-    /* MODAL DA CÂMERA */
+    /* MODAL */
     #cameraModal {
       position: fixed;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
+      width: 100vw;
+      height: 100vh;
       background: rgba(0,0,0,0.75);
       display: none;
       align-items: center;
@@ -124,9 +124,11 @@
     #cameraBox {
       background: white;
       padding: 15px;
-      border-radius: 10px;
+      border-radius: 12px;
       text-align: center;
       width: 320px;
+      transition: transform 0.3s ease;
+      transform-origin: center center;
     }
 
     #cameraPreview {
@@ -146,6 +148,13 @@
       margin: 5px;
       padding: 10px;
       font-size: 0.9rem;
+    }
+
+    /* ROTAÇÃO AUTOMÁTICA */
+    .rotate-90 {
+      transform: rotate(90deg);
+      width: 100vh !important;
+      height: 100vw !important;
     }
 
   </style>
@@ -212,14 +221,38 @@
     </div>
   </div>
 
-  <!-- SCRIPT ULTRA -->
-  <script>
+  
+<script>
 let currentField = "";
 let currentStream = null;
 
+/* Detecta modo landscape e gira o modal */
+function adjustCameraOrientation() {
+    const isLandscape = window.innerWidth > window.innerHeight;
+    const cameraBox = document.getElementById("cameraBox");
+
+    if (isLandscape) {
+        cameraBox.classList.add("rotate-90");
+    } else {
+        cameraBox.classList.remove("rotate-90");
+    }
+}
+
+window.addEventListener("orientationchange", adjustCameraOrientation);
+
+/* Aplicado quando o modal abre */
+function applyModalRotation() {
+    setTimeout(adjustCameraOrientation, 150);
+}
+
+
+
+/* ======== CÂMERA ULTRA ======== */
 async function openCamera(field) {
     currentField = field;
     document.getElementById("cameraModal").style.display = "flex";
+
+    applyModalRotation();
 
     const constraints = {
         video: {
@@ -227,7 +260,6 @@ async function openCamera(field) {
             width: { ideal: 1920 },
             height: { ideal: 1080 },
             frameRate: { ideal: 30 },
-
             advanced: [
                 { focusMode: "continuous" },
                 { exposureMode: "continuous" },
@@ -244,8 +276,8 @@ async function openCamera(field) {
         video.srcObject = currentStream;
         await video.play();
 
-        // Delay para ajustar foco
-        await new Promise(r => setTimeout(r, 600));
+        // Delay suave para focar automaticamente
+        await new Promise(r => setTimeout(r, 650));
 
     } catch (err) {
         alert("Erro ao acessar câmera: " + err.message);
@@ -262,6 +294,8 @@ function closeCamera() {
     }
 }
 
+
+/* ======== CAPTURA ======== */
 function capturePhoto() {
     const video = document.getElementById("cameraPreview");
 
@@ -271,17 +305,16 @@ function capturePhoto() {
 
     const ctx = canvas.getContext("2d");
 
-    // Desenhar imagem
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    // SHARPEN — leve para nitidez
+    // SHARPEN LEVE
     const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const data = imgData.data;
 
     for (let i = 0; i < data.length; i += 4) {
-        data[i]     = Math.min(255, data[i] * 1.05);     // Red
-        data[i + 1] = Math.min(255, data[i + 1] * 1.05); // Green
-        data[i + 2] = Math.min(255, data[i + 2] * 1.05); // Blue
+        data[i]     = Math.min(255, data[i] * 1.05);
+        data[i + 1] = Math.min(255, data[i + 1] * 1.05);
+        data[i + 2] = Math.min(255, data[i + 2] * 1.05);
     }
 
     ctx.putImageData(imgData, 0, 0);
@@ -302,6 +335,8 @@ function capturePhoto() {
     }, "image/jpeg", 0.92);
 }
 
+
+/* ======== SUBMIT ======== */
 document.addEventListener("DOMContentLoaded", () => {
     const now = new Date();
     document.getElementById("arrival_time").value = now.toLocaleString("pt-BR");
@@ -324,6 +359,7 @@ document.getElementById("finalForm").addEventListener("submit", async e => {
     }
 
     const formData = new FormData(e.target);
+
     try {
         const res = await fetch("/submit_final", { method: "POST", body: formData });
         const data = await res.json();
@@ -334,14 +370,16 @@ document.getElementById("finalForm").addEventListener("submit", async e => {
         } else {
             alert("Erro ao salvar.");
         }
-    } catch {
+
+    } catch (err) {
         alert("Erro de rede.");
     }
 
     btn.disabled = false;
     btn.textContent = "Salvar Chegada";
 });
-  </script>
+</script>
 
 </body>
 </html>
+
