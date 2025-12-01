@@ -3,65 +3,148 @@
 <head>
   <meta charset="UTF-8">
   <title>Controle de Carro - Final</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
-    body { margin:0; padding:0; font-family:'Segoe UI',sans-serif;
-      background: linear-gradient(100deg,#b001a8 0%,#0277b7 100%);
-      min-height:100vh; display:flex; align-items:center; justify-content:center; }
-
-    .container { width:90%; max-width:600px; background:white; padding:20px; border-radius:12px;
-      box-shadow:0 0 15px rgba(0,0,0,0.15); margin:20px; }
-
-    h1 { text-align:center; color:#333; font-size:1.6rem; }
-
-    form { display:flex; flex-direction:column; }
-    .photo-section { display:flex; flex-direction:column; margin-top:10px; }
-    .photo-buttons { display:flex; gap:10px; margin-top:5px; }
-    .photo-buttons button { padding:8px 12px; background:#007bff; color:#fff; border:none; border-radius:4px; cursor:pointer; font-size:0.9rem; }
-    .photo-buttons button:hover { background:#0056b3; }
-    .photo-preview { margin-top:10px; max-width:200px; max-height:150px; border:1px solid #ccc; display:none; object-fit:cover; }
-
-    label { margin-top:12px; font-weight:bold; font-size:0.95rem; }
-    input, textarea { padding:10px; margin-top:5px; border:1px solid #ccc; border-radius:6px; font-size:0.95rem; }
-    input[readonly]{ background:#f9f9f9; color:#666; }
-
-    button[type="submit"] { margin-top:25px; padding:12px; background:#4CAF50; color:white; border:none; border-radius:6px; cursor:pointer; font-size:1rem; transition:background-color .3s; }
-    button[type="submit"]:hover { background:#45a049; }
-
-    /* Modal full-screen overlay */
-    #cameraModal { position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.75);
-      display:none; align-items:center; justify-content:center; z-index:99999; -webkit-tap-highlight-color: transparent; }
-
-    /* cameraBox is the element we rotate */
-    #cameraBox { background:#fff; padding:12px; border-radius:12px; text-align:center;
-      width:320px; max-width:90vw; transition:transform .25s ease, width .25s ease, height .25s ease; transform-origin:center center; }
-
-    /* video */
-    #cameraPreview { width:100%; height: auto; background:black; border-radius:10px; object-fit:cover; }
-
-    /* buttons container; will be contrarotated when modal rotates */
-    #cameraButtons { margin-top:10px; display:flex; gap:8px; justify-content:space-between; align-items:center; }
-
-    #cameraButtons button { flex:1; padding:10px; font-size:0.95rem; border-radius:8px; border:none; cursor:pointer; }
-    #cameraButtons button:first-child { background:#28a745; color:white; }
-    #cameraButtons button:last-child { background:#cc0000; color:white; }
-
-    /* Landscape rotation class on cameraBox */
-    .rotated-90 { transform: rotate(90deg); width: calc(100vh - 40px); height: calc(100vw - 80px); }
-
-    /* When rotated, contrarotate inner controls to keep them upright */
-    .rotated-90 #cameraButtons { transform: rotate(-90deg); transform-origin: center center; /* keep buttons readable */ }
-
-    /* Adjust buttons appearance when contrarotated (so they fit) */
-    .rotated-90 #cameraButtons button { padding:8px; font-size:0.9rem; }
-
-    @media (max-width:600px){
-      .container{ padding:15px; border-radius:10px; } h1{ font-size:1.4rem; } label{ font-size:0.9rem; } input{ font-size:0.9rem; padding:9px; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(100deg, #b001a8 0%, #0277b7 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
+
+    .container {
+      width: 90%;
+      max-width: 600px;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+      margin: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      font-size: 1.6rem;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .photo-section {
+      display: flex;
+      flex-direction: column;
+      margin-top: 10px;
+    }
+
+    .photo-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 5px;
+    }
+
+    .photo-buttons button {
+      padding: 8px 12px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .photo-preview {
+      margin-top: 10px;
+      max-width: 200px;
+      max-height: 150px;
+      border: 1px solid #ccc;
+      display: none;
+    }
+
+    label {
+      margin-top: 12px;
+      font-weight: bold;
+      font-size: 0.95rem;
+    }
+
+    input {
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 0.95rem;
+    }
+
+    input[readonly] {
+      background-color: #f9f9f9;
+      color: #666;
+    }
+
+    button {
+      margin-top: 25px;
+      padding: 12px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s;
+    }
+
+    /* MODAL DE CÂMERA */
+    #cameraModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    #cameraBox {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      width: 320px;
+    }
+
+    #cameraPreview {
+      width: 100%;
+      border-radius: 10px;
+      background: black;
+      object-fit: cover;
+    }
+
+    #cameraButtons {
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    #cameraButtons button {
+      flex: 1;
+      margin: 5px;
+      padding: 10px;
+      font-size: 0.9rem;
+    }
+
   </style>
 </head>
-<body>
 
+<body>
   <div class="container">
     <h1>Controle de Carro - Chegada</h1>
 
@@ -77,18 +160,20 @@
       <label for="arrival_time">Data e Hora de Chegada:</label>
       <input type="text" id="arrival_time" name="arrival_time" readonly>
 
+      <!-- FOTO KM FINAL -->
       <div class="photo-section">
         <label>Foto do Km Final:</label>
-        <input type="file" id="final_km_file" name="final_km_photo" accept="image/*" style="display:none;">
+        <input type="file" id="final_km_file" name="final_km_photo" accept="image/*" style="display: none;">
         <div class="photo-buttons">
           <button type="button" onclick="openCamera('final_km')">Tirar Foto</button>
         </div>
         <img id="final_km_preview" class="photo-preview" alt="Preview">
       </div>
 
+      <!-- FOTO TANQUE FINAL -->
       <div class="photo-section">
         <label>Foto do Nível Final do Tanque:</label>
-        <input type="file" id="final_tank_file" name="final_tank_photo" accept="image/*" style="display:none;">
+        <input type="file" id="final_tank_file" name="final_tank_photo" accept="image/*" style="display: none;">
         <div class="photo-buttons">
           <button type="button" onclick="openCamera('final_tank')">Tirar Foto</button>
         </div>
@@ -98,72 +183,42 @@
       <label for="observations">Observações:</label>
       <textarea id="observations" name="observations" rows="4"></textarea>
 
-      <div style="display:flex; gap:10px; margin-top:25px;">
+      <div style="display: flex; gap: 10px; margin-top: 25px;">
         <button type="submit">Salvar Chegada</button>
-        <button type="button" onclick="window.location.href='/'" style="background:#f44336; color:white;">Sair</button>
+        <button type="button" onclick="window.location.href='/'" style="background-color: #f44336;">Sair</button>
       </div>
     </form>
   </div>
 
-  <!-- CAMERA MODAL -->
-  <div id="cameraModal" aria-hidden="true">
-    <div id="cameraBox" role="dialog" aria-modal="true">
-      <video id="cameraPreview" autoplay playsinline muted></video>
+  <!-- MODAL DE CÂMERA -->
+  <div id="cameraModal">
+    <div id="cameraBox">
+      <video id="cameraPreview" autoplay playsinline></video>
+
       <div id="cameraButtons">
-        <button id="btnCapture" type="button">Capturar</button>
-        <button id="btnClose" type="button">Fechar</button>
+        <button onclick="capturePhoto()">Capturar</button>
+        <button onclick="closeCamera()" style="background:#cc0000;">Fechar</button>
       </div>
     </div>
   </div>
 
 <script>
-/* ====== Variáveis globais ====== */
 let currentField = "";
 let currentStream = null;
 
-/* ====== Helpers de orientação ====== */
-function getOrientationAngle(){
-  // Preferir Screen Orientation API quando disponível
-  if (screen.orientation && typeof screen.orientation.angle === "number") return screen.orientation.angle;
-  // window.orientation é legacy mas ainda útil
-  if (typeof window.orientation === "number") return window.orientation;
-  // fallback: largura vs altura
-  return (window.innerWidth > window.innerHeight) ? 90 : 0;
-}
-
-function applyModalRotationNow(){
-  const angle = getOrientationAngle();
-  const box = document.getElementById("cameraBox");
-
-  // Normalizar: consider 90 or -90 como landscape
-  if (angle === 90 || angle === -90) {
-    box.classList.add("rotated-90");
-  } else {
-    box.classList.remove("rotated-90");
-  }
-}
-
-// Também ouvir resize/orientation changes para garantir atualização rápida
-window.addEventListener("orientationchange", () => setTimeout(applyModalRotationNow, 150));
-window.addEventListener("resize", () => setTimeout(applyModalRotationNow, 120));
-
-/* ====== Abrir câmera (ULTRA) ====== */
-async function openCamera(field){
+async function openCamera(field) {
   currentField = field;
+
   document.getElementById("cameraModal").style.display = "flex";
-  document.getElementById("cameraModal").setAttribute("aria-hidden","false");
 
-  // Aplicar rotação inicial (p/ casos onde já está landscape)
-  applyModalRotationNow();
-
+  // Ultra qualidade
   const constraints = {
-    audio: false,
     video: {
       facingMode: "environment",
       width: { ideal: 1920 },
       height: { ideal: 1080 },
       frameRate: { ideal: 30 },
-      // advanced constraints; browser pode ignorar se não suportado
+      noiseSuppression: true,
       advanced: [
         { focusMode: "continuous" },
         { exposureMode: "continuous" },
@@ -173,28 +228,22 @@ async function openCamera(field){
   };
 
   try {
-    currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+    currentStream = stream;
 
     const video = document.getElementById("cameraPreview");
-    video.srcObject = currentStream;
-    await video.play();
+    video.srcObject = stream;
 
-    // Peça ao layout para ajustar caso o video carregue com dimensões diferentes
-    setTimeout(() => applyModalRotationNow(), 150);
+    await new Promise(r => setTimeout(r, 350)); // ajuda foco inicial
 
-    // Delay suave para permitir foco automático estabilizar
-    await new Promise(r => setTimeout(r, 650));
   } catch (err) {
-    console.error("Erro getUserMedia:", err);
-    alert("Erro ao acessar a câmera: " + (err && err.message ? err.message : err));
+    alert("Erro ao acessar a câmera: " + err.message);
     closeCamera();
   }
 }
 
-/* ====== Fechar câmera ====== */
-function closeCamera(){
+function closeCamera() {
   document.getElementById("cameraModal").style.display = "none";
-  document.getElementById("cameraModal").setAttribute("aria-hidden","true");
 
   if (currentStream) {
     currentStream.getTracks().forEach(t => t.stop());
@@ -202,97 +251,37 @@ function closeCamera(){
   }
 }
 
-/* ====== Capturar foto com pós-process (sharpen leve) ====== */
-async function capturePhoto(){
+function capturePhoto() {
   const video = document.getElementById("cameraPreview");
-  if (!video || video.readyState < 2) { // HAVE_CURRENT_DATA
-    alert("Câmera ainda inicializando. Aguarde um instante.");
-    return;
-  }
 
-  // Criar canvas com mesma proporção que vídeo (usar videoWidth/videoHeight se disponível)
-  const w = video.videoWidth || 1920;
-  const h = video.videoHeight || 1080;
   const canvas = document.createElement("canvas");
-  canvas.width = w;
-  canvas.height = h;
+  canvas.width = 1920;
+  canvas.height = 1080;
+
   const ctx = canvas.getContext("2d");
 
-  // Para garantir a orientação correta quando modal foi rotacionado,
-  // desenhamos sempre do vídeo direto (canvas não precisa de rotação extra).
+  ctx.filter = "contrast(1.05) brightness(1.02) saturate(1.08)";
   ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-  // Aplicar um filtro leve de sharpening/contraste (simples, rápido)
-  try {
-    const imgData = ctx.getImageData(0,0,canvas.width,canvas.height);
-    const data = imgData.data;
-    // leve ajuste de contraste/ganho (performance-friendly)
-    const gain = 1.06;
-    for (let i=0;i<data.length;i+=4){
-      data[i]   = Math.min(255, data[i] * gain);     // R
-      data[i+1] = Math.min(255, data[i+1] * gain);   // G
-      data[i+2] = Math.min(255, data[i+2] * gain);   // B
-    }
-    ctx.putImageData(imgData,0,0);
-  } catch (err){
-    // Em dispositivos com limitações de segurança CORS/tainted canvas, pode falhar; não bloqueia captura.
-    console.warn("Não foi possível aplicar pós-processamento:", err);
-  }
-
-  // Gerar blob com qualidade alta
   canvas.toBlob(blob => {
-    if (!blob) {
-      alert("Falha ao gerar imagem.");
-      return;
-    }
     const file = new File([blob], `${currentField}.jpg`, { type: "image/jpeg" });
+
     const dt = new DataTransfer();
     dt.items.add(file);
-    const input = document.getElementById(`${currentField}_file`);
-    input.files = dt.files;
 
-    // Preview
+    document.getElementById(`${currentField}_file`).files = dt.files;
+
     const preview = document.getElementById(`${currentField}_preview`);
     preview.src = URL.createObjectURL(blob);
     preview.style.display = "block";
 
-    // fechar câmera
     closeCamera();
-  }, "image/jpeg", 0.92);
+  }, "image/jpeg", 0.95);
 }
 
-/* ====== Botões do modal (linkar eventos) ====== */
 document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("btnCapture").addEventListener("click", capturePhoto);
-  document.getElementById("btnClose").addEventListener("click", closeCamera);
-
-  // preencher arrival_time
   const now = new Date();
-  const el = document.getElementById("arrival_time");
-  if (el) el.value = now.toLocaleString("pt-BR");
-
-  // Garantir ajuste inicial caso usuário abra modal após rotação
-  applyModalRotationNow();
-});
-
-/* ====== Submit do form ====== */
-document.getElementById("finalForm").addEventListener("submit", async function(e){
-  e.preventDefault();
-  const btn = this.querySelector('button[type="submit"]');
-  btn.disabled = true;
-  btn.textContent = "Enviando...";
-
-  if (!document.getElementById("final_km_file").files.length) { alert("Tire a foto do KM Final!"); btn.disabled=false; btn.textContent="Salvar Chegada"; return; }
-  if (!document.getElementById("final_tank_file").files.length) { alert("Tire a foto do tanque!"); btn.disabled=false; btn.textContent="Salvar Chegada"; return; }
-
-  const formData = new FormData(this);
-  try {
-    const res = await fetch("/submit_final", { method: "POST", body: formData });
-    const data = await res.json();
-    if (data.status === "ok") { alert("Chegada registrada!"); window.location.href = "/"; }
-    else { alert("Erro ao salvar."); }
-  } catch (err) { console.error(err); alert("Erro de rede."); }
-  btn.disabled = false; btn.textContent = "Salvar Chegada";
+  document.getElementById("arrival_time").value = now.toLocaleString("pt-BR");
 });
 </script>
 
