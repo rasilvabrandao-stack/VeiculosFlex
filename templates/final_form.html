@@ -60,6 +60,10 @@
       font-size: 0.9rem;
     }
 
+    .photo-buttons button:hover {
+      background-color: #0056b3;
+    }
+
     .photo-preview {
       margin-top: 10px;
       max-width: 200px;
@@ -99,6 +103,10 @@
       transition: background-color 0.3s;
     }
 
+    button:hover {
+      background-color: #45a049;
+    }
+
     /* MODAL DE CÂMERA */
     #cameraModal {
       position: fixed;
@@ -118,14 +126,13 @@
       padding: 15px;
       border-radius: 10px;
       text-align: center;
-      width: 320px;
+      width: 300px;
     }
 
     #cameraPreview {
       width: 100%;
       border-radius: 10px;
       background: black;
-      object-fit: cover;
     }
 
     #cameraButtons {
@@ -193,7 +200,7 @@
   <!-- MODAL DE CÂMERA -->
   <div id="cameraModal">
     <div id="cameraBox">
-      <video id="cameraPreview" autoplay playsinline></video>
+      <video id="cameraPreview" autoplay></video>
 
       <div id="cameraButtons">
         <button onclick="capturePhoto()">Capturar</button>
@@ -202,88 +209,100 @@
     </div>
   </div>
 
-<script>
-let currentField = "";
-let currentStream = null;
+  <script>
+    let currentField = "";
+    let currentStream = null;
 
-async function openCamera(field) {
-  currentField = field;
+    function openCamera(field) {
+      currentField = field;
+      document.getElementById("cameraModal").style.display = "flex";
 
-  document.getElementById("cameraModal").style.display = "flex";
-
-  // Ultra qualidade
-  const constraints = {
-    video: {
-      facingMode: "environment",
-      width: { ideal: 1920 },
-      height: { ideal: 1080 },
-      frameRate: { ideal: 30 },
-      noiseSuppression: true,
-      advanced: [
-        { focusMode: "continuous" },
-        { exposureMode: "continuous" },
-        { whiteBalanceMode: "continuous" }
-      ]
+      navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: "environment",
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        }
+      }).then(stream => {
+        currentStream = stream;
+        document.getElementById("cameraPreview").srcObject = stream;
+      }).catch(err => {
+        alert("Erro ao acessar a câmera: " + err.message);
+      });
     }
-  };
 
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia(constraints);
-    currentStream = stream;
+    function closeCamera() {
+      document.getElementById("cameraModal").style.display = "none";
+      if (currentStream) {
+        currentStream.getTracks().forEach(t => t.stop());
+      }
+    }
 
-    const video = document.getElementById("cameraPreview");
-    video.srcObject = stream;
+    function capturePhoto() {
+      const video = document.getElementById("cameraPreview");
+      const canvas = document.createElement("canvas");
+      canvas.width = 1280;
+      canvas.height = 720;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    await new Promise(r => setTimeout(r, 350)); // ajuda foco inicial
+      canvas.toBlob(blob => {
+        const file = new File([blob], `${currentField}.jpg`, { type: "image/jpeg" });
 
-  } catch (err) {
-    alert("Erro ao acessar a câmera: " + err.message);
-    closeCamera();
-  }
-}
+        const dt = new DataTransfer();
+        dt.items.add(file);
 
-function closeCamera() {
-  document.getElementById("cameraModal").style.display = "none";
+        document.getElementById(`${currentField}_file`).files = dt.files;
 
-  if (currentStream) {
-    currentStream.getTracks().forEach(t => t.stop());
-    currentStream = null;
-  }
-}
+        const preview = document.getElementById(`${currentField}_preview`);
+        preview.src = URL.createObjectURL(blob);
+        preview.style.display = "block";
 
-function capturePhoto() {
-  const video = document.getElementById("cameraPreview");
+        closeCamera();
+      }, "image/jpeg");
+    }
 
-  const canvas = document.createElement("canvas");
-  canvas.width = 1920;
-  canvas.height = 1080;
+    document.addEventListener("DOMContentLoaded", () => {
+      const now = new Date();
+      document.getElementById("arrival_time").value = now.toLocaleString("pt-BR");
+    });
 
-  const ctx = canvas.getContext("2d");
+    document.getElementById("finalForm").addEventListener("submit", async e => {
+      e.preventDefault();
 
-  ctx.filter = "contrast(1.05) brightness(1.02) saturate(1.08)";
-  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const btn = e.target.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      btn.textContent = "Enviando...";
 
-  canvas.toBlob(blob => {
-    const file = new File([blob], `${currentField}.jpg`, { type: "image/jpeg" });
+      if (!document.getElementById("final_km_file").files.length) {
+        alert("Tire a foto do KM Final.");
+        btn.disabled = false; btn.textContent = "Salvar Chegada"; return;
+      }
+      if (!document.getElementById("final_tank_file").files.length) {
+        alert("Tire a foto do Tanque Final.");
+        btn.disabled = false; btn.textContent = "Salvar Chegada"; return;
+      }
 
-    const dt = new DataTransfer();
-    dt.items.add(file);
+      const formData = new FormData(e.target);
 
-    document.getElementById(`${currentField}_file`).files = dt.files;
+      try {
+        const response = await fetch("/submit_final", { method: "POST", body: formData });
+        const data = await response.json();
 
-    const preview = document.getElementById(`${currentField}_preview`);
-    preview.src = URL.createObjectURL(blob);
-    preview.style.display = "block";
+        if (data.status === "ok") {
+          alert("Chegada registrada!");
+          window.location.href = "/";
+        } else {
+          alert("Erro ao salvar.");
+        }
+      } catch {
+        alert("Erro de rede.");
+      }
 
-    closeCamera();
-  }, "image/jpeg", 0.95);
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  const now = new Date();
-  document.getElementById("arrival_time").value = now.toLocaleString("pt-BR");
-});
-</script>
+      btn.disabled = false;
+      btn.textContent = "Salvar Chegada";
+    });
+  </script>
 
 </body>
 </html>
